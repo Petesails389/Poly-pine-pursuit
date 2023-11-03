@@ -5,11 +5,14 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     private GameObject mainCamera;
+    private PlayerMovement playerMovement;
 
     // Start is called before the first frame update
     void Start()
     {
+        //find various objects and components
         mainCamera = GameObject.Find("Camera");
+        playerMovement = GetComponent<PlayerMovement>();
 
         //sorts out the cursor
         Cursor.visible = false;
@@ -20,6 +23,8 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         mainCamera.GetComponent<cameraController>().Rotate(Input.GetAxis("Mouse Y"));
-        GetComponent<PlayerMovement>().Rotate(Input.GetAxis("Mouse X"));
+        playerMovement.Rotate(Input.GetAxis("Mouse X"));
+        playerMovement.Move(Input.GetAxis("Horizontal"),Input.GetAxis("Vertical"));
+
     }
 }

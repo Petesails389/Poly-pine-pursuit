@@ -20,5 +20,6 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         mainCamera.GetComponent<cameraController>().Rotate(Input.GetAxis("Mouse Y"));
+        GetComponent<PlayerMovement>().Rotate(Input.GetAxis("Mouse X"));
     }
 }

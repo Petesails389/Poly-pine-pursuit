@@ -228,10 +228,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 3306780660599492186, guid: 0f06cfa22c918844784161a83e4c93fb, type: 3}
-      propertyPath: sensitivity
-      value: 4
-      objectReference: {fileID: 0}
     - target: {fileID: 4426110992967125252, guid: 0f06cfa22c918844784161a83e4c93fb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0

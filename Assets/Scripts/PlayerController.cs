@@ -26,5 +26,9 @@ public class PlayerController : MonoBehaviour
         playerMovement.Rotate(Input.GetAxis("Mouse X"));
         playerMovement.Move(Input.GetAxis("Horizontal"),Input.GetAxis("Vertical"));
 
+        if (Input.GetAxis("Jump") != 0f) {
+            playerMovement.Jump();
+        }
+
     }
 }

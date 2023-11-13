@@ -111,11 +111,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31e3ae100e5a619478cbaeb4d9ff566f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  size: 200
+  size: 100
   resolution: 1
   scale1: 0.01
   scale2: 0.05
   scale3: 0.09
-  scale1y: 15
-  scale2y: 5
+  scale1y: 13
+  scale2y: 4
   scale3y: 1
+  trees:
+  - {fileID: 4279274859734573110, guid: 168449a75d9d616408b5a70203b385e7, type: 3}
+  - {fileID: 3448199983609305316, guid: f028abc84ac6a7f44bbe00711b309ea9, type: 3}
+  - {fileID: 1766445395065557340, guid: aaa0978373eeea44abf3e82a1a78d22d, type: 3}
+  - {fileID: 4356878230869493299, guid: 6ee3f7ee633002640a8b9ae9f84a1fe0, type: 3}
+  - {fileID: 6476716959314052646, guid: 3f8491dfcfe5d9444931da6e198b0a8c, type: 3}
+  - {fileID: 4998372404890591903, guid: 9cea270037f2ef6489dfa982becb7df4, type: 3}
+  - {fileID: 3501491591976136957, guid: 45876c976c3170d47a50df7a3ce95b6a, type: 3}
+  - {fileID: 2518292229029580559, guid: adeaa28f565630847829bc834b076bb3, type: 3}
+  treeDensity: 1.7
+  details:
+  - {fileID: 6800420046945608595, guid: 100b7860074a1354888e4d2407c21b94, type: 3}
+  - {fileID: 5558723857900493275, guid: 2f4a6f250988643419d411e3aaeba866, type: 3}
+  - {fileID: 2000667821580051495, guid: ad9422a69535ac049a913db29528b0fa, type: 3}
+  - {fileID: 5558723857900493275, guid: 2f4a6f250988643419d411e3aaeba866, type: 3}
+  - {fileID: 7708612099413960536, guid: 5cf9aadad13b1b048a877016b5187cc9, type: 3}
+  - {fileID: 1862524612162421281, guid: 13ce7024050284446bab7ed64dfe4de8, type: 3}
+  detailDensity: 6

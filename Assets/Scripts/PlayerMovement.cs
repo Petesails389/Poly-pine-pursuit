@@ -28,9 +28,9 @@ public class PlayerMovement : MonoBehaviour
     //move function takes in values between 1 and -1
     public void Move(float x,float z)
     {
-        Vector3 X = transform.right*x*speed*Time.deltaTime;
+        Vector3 X = transform.right*x*speed;
         Vector3 Y = transform.up * GetComponent<Rigidbody>().velocity.y;
-        Vector3 Z = transform.forward*z*speed*Time.deltaTime;
+        Vector3 Z = transform.forward*z*speed;
         GetComponent<Rigidbody>().velocity = X + Y + Z;
     }
 

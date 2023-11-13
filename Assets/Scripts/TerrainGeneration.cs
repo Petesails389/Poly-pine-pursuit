@@ -15,10 +15,34 @@ public class TerrainGeneration : MonoBehaviour
     [SerializeField] private float scale2y;
     [SerializeField] private float scale3y;
 
+    [SerializeField] private GameObject[] trees; 
+    [SerializeField] private float treeDensity;
+
+    [SerializeField] private GameObject[] details; 
+    [SerializeField] private float detailDensity;
+
+
+    //the terrain mesh
+    private Mesh mesh;
+
 
     void Start()
     {
-        Mesh mesh = new Mesh();
+        mesh = new Mesh();
+        //generates a new terrain mesh
+        GenerateMesh();
+        //applies the new mesh to the components that need it
+        GetComponent<MeshFilter>().mesh = mesh;
+        GetComponent<MeshCollider>().sharedMesh = mesh;
+
+        //generates trees and smaller items
+        GenerateItems(trees, treeDensity);
+        GenerateItems(details, detailDensity);
+
+    }
+
+    private void GenerateMesh()
+    {
         List<Vector3> vertices = new List<Vector3>();
         List<int> triangles = new List<int>();
 
@@ -28,9 +52,9 @@ public class TerrainGeneration : MonoBehaviour
             for (float z = 0; z < size; z += resolution)
             {
                 //add the verticies for the first triangle
-                vertices.Add(GetVertex(x+1,z));
-                vertices.Add(GetVertex(x,z+1));
-                vertices.Add(GetVertex(x,z));
+                vertices.Add(GetNewVertex(x+1,z));
+                vertices.Add(GetNewVertex(x,z+1));
+                vertices.Add(GetNewVertex(x,z));
                 //adds the first triangle
                 triangles.Add(vertices.Count-1);
                 triangles.Add(vertices.Count-2);
@@ -38,9 +62,9 @@ public class TerrainGeneration : MonoBehaviour
 
 
                 //add the verticies for the second triangle
-                vertices.Add(GetVertex(x+1,z+1));
-                vertices.Add(GetVertex(x,z+1));
-                vertices.Add(GetVertex(x+1,z));
+                vertices.Add(GetNewVertex(x+1,z+1));
+                vertices.Add(GetNewVertex(x,z+1));
+                vertices.Add(GetNewVertex(x+1,z));
                 //adds the second triangle
                 triangles.Add(vertices.Count-1);
                 triangles.Add(vertices.Count-2);
@@ -53,14 +77,27 @@ public class TerrainGeneration : MonoBehaviour
         mesh.vertices = vertices.ToArray();
         mesh.triangles = triangles.ToArray();
         mesh.RecalculateNormals();
+    }
 
-        //applies the new mesh to the componentes
-        GetComponent<MeshFilter>().mesh = mesh;
-        GetComponent<MeshCollider>().sharedMesh = mesh;
+    //generates items in the world
+    private void GenerateItems(GameObject[] list, float density) {
+        for (int i = 0; i<((int)size^(int)2)/treeDensity; i++) {
+            PlaceItem(list[Random.Range(0, list.Length)]);
+        }
+    }
+
+    //places an item in the world
+    private void PlaceItem(GameObject item)
+    {
+        Vector3[] vertices = mesh.vertices;
+        Debug.Log(vertices.Length);
+        Vector3 vertex = vertices[Random.Range(0, vertices.Length)];
+        float rotation = Random.Range(0f, 360f);
+        Instantiate(item, vertex + new Vector3(0,-0.2f,0), Quaternion.AngleAxis(rotation, Vector3.up));
     }
 
     //returns a point in space based of 3 layered noise maps
-    private Vector3 GetVertex(float x, float z) 
+    private Vector3 GetNewVertex(float x, float z) 
     {
         float y1 = Mathf.PerlinNoise(x * scale1,z*scale1)*scale1y;
         float y2 = Mathf.PerlinNoise(x * scale2,z*scale2)*scale2y;

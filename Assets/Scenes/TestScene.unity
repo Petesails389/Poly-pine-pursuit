@@ -281,6 +281,26 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 7862041219374375766, guid: 01f3341cca9a4c74fbeaaa6f4797f7be, type: 3}
+      propertyPath: trees.Array.data[8]
+      value: 
+      objectReference: {fileID: 3537918922507577589, guid: 4f32a6af79255414eab0dd1ec8e31082, type: 3}
+    - target: {fileID: 7862041219374375766, guid: 01f3341cca9a4c74fbeaaa6f4797f7be, type: 3}
+      propertyPath: trees.Array.data[9]
+      value: 
+      objectReference: {fileID: 4431040743833238910, guid: 286233eeea645a4428760f23657712e3, type: 3}
+    - target: {fileID: 7862041219374375766, guid: 01f3341cca9a4c74fbeaaa6f4797f7be, type: 3}
+      propertyPath: trees.Array.data[10]
+      value: 
+      objectReference: {fileID: 3991631796636654472, guid: 140e3941882972b4fb515df2315303ed, type: 3}
+    - target: {fileID: 7862041219374375766, guid: 01f3341cca9a4c74fbeaaa6f4797f7be, type: 3}
+      propertyPath: trees.Array.data[11]
+      value: 
+      objectReference: {fileID: 1299804012139768894, guid: c7fcc481d87e4aa4a97e95fd2781a08e, type: 3}
+    - target: {fileID: 7862041219374375766, guid: 01f3341cca9a4c74fbeaaa6f4797f7be, type: 3}
+      propertyPath: details.Array.data[10]
+      value: 
+      objectReference: {fileID: 2613225122965375447, guid: 7220d9f9ee25c034db9a7111312c75b3, type: 3}
     - target: {fileID: 7862041219374375767, guid: 01f3341cca9a4c74fbeaaa6f4797f7be, type: 3}
       propertyPath: m_Name
       value: Terrain

@@ -6,6 +6,7 @@ public class TerrainGeneration : MonoBehaviour
 {
     [SerializeField] private float size = 50f;
     [SerializeField] private float resolution = 0.5f;
+    [SerializeField] private float seed;
 
     [SerializeField] private float scale1;
     [SerializeField] private float scale2;
@@ -28,6 +29,7 @@ public class TerrainGeneration : MonoBehaviour
 
     void Start()
     {
+        Random.InitState((int) seed);
         mesh = new Mesh();
         //generates a new terrain mesh
         GenerateMesh();
@@ -90,18 +92,19 @@ public class TerrainGeneration : MonoBehaviour
     private void PlaceItem(GameObject item)
     {
         Vector3[] vertices = mesh.vertices;
-        Debug.Log(vertices.Length);
         Vector3 vertex = vertices[Random.Range(0, vertices.Length)];
         float rotation = Random.Range(0f, 360f);
         Instantiate(item, vertex + new Vector3(0,-0.2f,0), Quaternion.AngleAxis(rotation, Vector3.up));
     }
 
-    //returns a point in space based of 3 layered noise maps
+    //returns a point in space based of 3 layered noise maps and a random offset based of the seed
     private Vector3 GetNewVertex(float x, float z) 
     {
-        float y1 = Mathf.PerlinNoise(x * scale1,z*scale1)*scale1y;
-        float y2 = Mathf.PerlinNoise(x * scale2,z*scale2)*scale2y;
-        float y3 = Mathf.PerlinNoise(x * scale3,z*scale3)*scale3y;
+        float newX = x + seed;
+        float newZ = z + seed;
+        float y1 = Mathf.PerlinNoise(newX * scale1,newZ * scale1)*scale1y;
+        float y2 = Mathf.PerlinNoise(newX * scale2,newZ * scale2)*scale2y;
+        float y3 = Mathf.PerlinNoise(newX * scale3,newZ * scale3)*scale3y;
         float y = y1+y2+y3;
         return new Vector3(x, y, z);
     }

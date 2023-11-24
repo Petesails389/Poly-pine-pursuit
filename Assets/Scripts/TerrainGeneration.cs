@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TerrainGeneration : MonoBehaviour
 {
-    [SerializeField] private float size = 50f;
+    [SerializeField] private float size;
     [SerializeField] private float resolution = 0.5f;
     [SerializeField] private float seed;
 
@@ -41,7 +41,20 @@ public class TerrainGeneration : MonoBehaviour
         GenerateItems(trees, treeDensity);
         GenerateItems(details, detailDensity);
 
+        AdjustWalls(); //moves the walls to the edge of the allowed map
     }
+
+    private void AdjustWalls() {
+        transform.GetChild(0).position += new Vector3(size/2,0,0);
+        transform.GetChild(0).localScale = new Vector3(size,100,1);
+        transform.GetChild(1).position += new Vector3(size/2,0,size);
+        transform.GetChild(1).localScale = new Vector3(size,100,1);
+        transform.GetChild(2).position += new Vector3(0,0,size/2);
+        transform.GetChild(2).localScale = new Vector3(size,100,1);
+        transform.GetChild(3).position += new Vector3(size,0,size/2);
+        transform.GetChild(3).localScale = new Vector3(size,100,1);
+    }
+
 
     private void GenerateMesh()
     {
@@ -49,9 +62,9 @@ public class TerrainGeneration : MonoBehaviour
         List<int> triangles = new List<int>();
 
         //populates veticies array
-       for (float x = 0; x < size; x += resolution)
+       for (float x = -size; x < size*3; x += resolution)
         {
-            for (float z = 0; z < size; z += resolution)
+            for (float z = -size; z < size*3; z += resolution)
             {
                 //add the verticies for the first triangle
                 vertices.Add(GetNewVertex(x+1,z));
@@ -83,7 +96,8 @@ public class TerrainGeneration : MonoBehaviour
 
     //generates items in the world
     private void GenerateItems(GameObject[] list, float density) {
-        for (int i = 0; i<((int)size^(int)2)/treeDensity; i++) {
+
+        for (int i = 0; i<((size*size*9)/density); i++) {
             PlaceItem(list[Random.Range(0, list.Length)]);
         }
     }

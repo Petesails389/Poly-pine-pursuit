@@ -168,7 +168,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1c0bcdeb08dce940a0169b4e0bd12f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnPoint: {x: 25, y: 50, z: 25}
 --- !u!114 &2999776721803049039
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -184,6 +183,7 @@ MonoBehaviour:
   sensitivity: 4
   speed: 10
   jumpForce: 1000
+  spawnPoint: {x: 50, y: 50, z: 50}
 --- !u!114 &-7672997229861156451
 MonoBehaviour:
   m_ObjectHideFlags: 0

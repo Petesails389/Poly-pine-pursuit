@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 976f99f46b9f6554aab4bf0fec972ac5, type: 3}
+  m_Name: Rocks
+  m_EditorClassIdentifier: 
+  density: 1000
+  items:
+  - {fileID: 6331535493288210368, guid: 859ee78e285ac5a44b3f22696ed3ad34, type: 3}
+  - {fileID: 3260459739065271421, guid: a8f481807b7e0c548a3f95db535f072b, type: 3}
+  - {fileID: 6676065428689825632, guid: 0a363844b18ec7b48b87e6382b3d27a2, type: 3}
+  - {fileID: 916937287902488902, guid: 36100188caa20714684ccf6bb61bca9e, type: 3}
+  - {fileID: 7606107650633949974, guid: b236bbd97cc72eb4dbe268ec9a3b3062, type: 3}
+  - {fileID: 2217747918433544893, guid: 2a7a759316c7d554bae95797a68bc7ee, type: 3}
+  - {fileID: 5211534128602146604, guid: 3f57e49755f377740bdcf50b255d04ca, type: 3}
+  - {fileID: 5382504220331282157, guid: 2117cbe9b55c67c4db18b95e280c1d1c, type: 3}
+  - {fileID: 7433201487791639516, guid: 38e9b00e6c62cdf4783f2463a8ee9519, type: 3}
+  - {fileID: 5361221658599700697, guid: 894bba1da6f6bfc41a82e74dfde09039, type: 3}
+  - {fileID: 8258305339121809215, guid: 919b43b16eacea448b498fb9ce06040a, type: 3}
+  - {fileID: 5700610215799493955, guid: c56da986b62f2464887f463f1dbf30f8, type: 3}
+  - {fileID: 5353628180288037533, guid: 1ed9c7b414f8bbb40947f077be86a5cb, type: 3}
+  - {fileID: 3347231932107798100, guid: 73f0a72b1ccd6444a8c7fb417e0c7166, type: 3}
+  - {fileID: 3259701357047259682, guid: 81e4ecff483a4744c87b667fc6046bd7, type: 3}
+  - {fileID: 4357530667896452435, guid: deb0e156e21210c4bbacefde7cea37c7, type: 3}
+  offset: 1

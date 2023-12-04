@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4876540170696343666}
   m_Layer: 0
   m_Name: Terrain03
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -92,7 +92,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5723400727859723558}
-  m_Material: {fileID: 13400000, guid: 4bb5ed1a816a24842b7cb0bc001f6223, type: 2}
+  m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4

@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
+using Unity.Netcode;
 
 public class TerrainGeneration : MonoBehaviour
 {
+    
     [SerializeField] private float size;
     [SerializeField] private float resolution = 0.5f;
-    [SerializeField] private float seed;
 
     [SerializeField] private float scale1;
     [SerializeField] private float scale2;
@@ -16,19 +18,16 @@ public class TerrainGeneration : MonoBehaviour
     [SerializeField] private float scale2y;
     [SerializeField] private float scale3y;
 
-    [SerializeField] private GameObject[] trees; 
-    [SerializeField] private float treeDensity;
-
-    [SerializeField] private GameObject[] details; 
-    [SerializeField] private float detailDensity;
-
+    [SerializeField] private ItemSet[] itemSets;
 
     //the terrain mesh
     private Mesh mesh;
+    //the seed to be used
+    int seed;
 
+    public void GenerateTerrain(){
+        seed = GameObject.Find("GameManager").GetComponent<GameManager>().GetSeed();
 
-    void Start()
-    {
         Random.InitState((int) seed);
         mesh = new Mesh();
         //generates a new terrain mesh
@@ -37,22 +36,23 @@ public class TerrainGeneration : MonoBehaviour
         GetComponent<MeshFilter>().mesh = mesh;
         GetComponent<MeshCollider>().sharedMesh = mesh;
 
-        //generates trees and smaller items
-        GenerateItems(trees, treeDensity);
-        GenerateItems(details, detailDensity);
+        //populates the map
+        foreach (ItemSet itemSet in itemSets){
+            GenerateItems(itemSet);
+        }
 
         AdjustWalls(); //moves the walls to the edge of the allowed map
     }
 
     private void AdjustWalls() {
-        transform.GetChild(0).position += new Vector3(size/2,0,0);
-        transform.GetChild(0).localScale = new Vector3(size,100,1);
-        transform.GetChild(1).position += new Vector3(size/2,0,size);
-        transform.GetChild(1).localScale = new Vector3(size,100,1);
-        transform.GetChild(2).position += new Vector3(0,0,size/2);
-        transform.GetChild(2).localScale = new Vector3(size,100,1);
-        transform.GetChild(3).position += new Vector3(size,0,size/2);
-        transform.GetChild(3).localScale = new Vector3(size,100,1);
+        GameObject.Find("Wall1").transform.position += new Vector3(size/2,0,0);
+        GameObject.Find("Wall1").transform.localScale = new Vector3(size,100,1);
+        GameObject.Find("Wall2").transform.position += new Vector3(size/2,0,size);
+        GameObject.Find("Wall2").transform.localScale = new Vector3(size,100,1);
+        GameObject.Find("Wall3").transform.position += new Vector3(0,0,size/2);
+        GameObject.Find("Wall3").transform.localScale = new Vector3(size,100,1);
+        GameObject.Find("Wall4").transform.position += new Vector3(size,0,size/2);
+        GameObject.Find("Wall4").transform.localScale = new Vector3(size,100,1);
     }
 
 
@@ -62,9 +62,9 @@ public class TerrainGeneration : MonoBehaviour
         List<int> triangles = new List<int>();
 
         //populates veticies array
-       for (float x = -size; x < size*3; x += resolution)
+       for (float x = -size; x < size*2; x += resolution)
         {
-            for (float z = -size; z < size*3; z += resolution)
+            for (float z = -size; z < size*2; z += resolution)
             {
                 //add the verticies for the first triangle
                 vertices.Add(GetNewVertex(x+1,z));
@@ -95,20 +95,19 @@ public class TerrainGeneration : MonoBehaviour
     }
 
     //generates items in the world
-    private void GenerateItems(GameObject[] list, float density) {
-
-        for (int i = 0; i<((size*size*9)/density); i++) {
-            PlaceItem(list[Random.Range(0, list.Length)]);
+    private void GenerateItems(ItemSet itemSet) {
+        for (int i = 0; i<((size*size*9)/itemSet.density); i++) {
+            PlaceItem(itemSet.items[Random.Range(0, itemSet.items.Length)], itemSet.offset);
         }
     }
 
     //places an item in the world
-    private void PlaceItem(GameObject item)
+    private void PlaceItem(GameObject item, float offset)
     {
         Vector3[] vertices = mesh.vertices;
         Vector3 vertex = vertices[Random.Range(0, vertices.Length)];
         float rotation = Random.Range(0f, 360f);
-        Instantiate(item, vertex + new Vector3(0,-0.2f,0), Quaternion.AngleAxis(rotation, Vector3.up));
+        Instantiate(item, vertex + new Vector3(0,-offset,0), Quaternion.AngleAxis(rotation, Vector3.up));
     }
 
     //returns a point in space based of 3 layered noise maps and a random offset based of the seed

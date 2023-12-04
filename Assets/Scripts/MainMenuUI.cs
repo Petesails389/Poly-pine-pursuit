@@ -15,19 +15,16 @@ public class MainMenuUI : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        SceneManager.sceneLoaded += OnSceneLoaded;
         
         clientButton.onClick.AddListener(()=> {
-            SceneManager.LoadScene("MainGame", LoadSceneMode.Additive);
-            host = false;
+            NetworkManager.Singleton.StartClient();
         });
         hostButton.onClick.AddListener(()=> {
-            SceneManager.LoadScene("MainGame", LoadSceneMode.Additive);
-            host = true;
+            NetworkManager.Singleton.StartHost();
         });
     }
 
-    // called second
+    /*/ called second
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         SceneManager.SetActiveScene(scene);
@@ -37,7 +34,9 @@ public class MainMenuUI : MonoBehaviour
         } else {
             NetworkManager.Singleton.StartClient();
         }
-        SceneManager.UnloadSceneAsync("MainMenu");
-    }
+
+        SceneManager.sceneLoaded -= OnSceneLoaded; //unsubsribe to scene events to prevent this being reference after scene unloaded
+        SceneManager.UnloadSceneAsync("MainMenu"); //unload the scene
+    }*/
 
 }

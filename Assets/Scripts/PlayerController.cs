@@ -9,9 +9,8 @@ public class PlayerController : NetworkBehaviour
     private GameObject mainCamera;
     private PlayerMovement playerMovement;
 
-    //pause logic bools
+    //escape rising edge
     private bool lastFrameEscape = false;
-    private bool paused = false;
 
     // Start is called before the first frame update
     void Start()
@@ -34,12 +33,13 @@ public class PlayerController : NetworkBehaviour
     {
         //pause logic, including rising edge
         if ((Input.GetAxis("Escape") != 0f) && !lastFrameEscape) {
-            PauseToggle();
+            GameObject.Find("GameManager").GetComponent<GameManager>().ToggleLocalPause();
+            CursorLockUpdate();
         }
         lastFrameEscape = (Input.GetAxis("Escape") != 0f);
 
-        if (paused) return; //return if paused
-        
+        if (GameObject.Find("GameManager").GetComponent<GameManager>().IsPaused()) return; //return if paused
+
         mainCamera.GetComponent<cameraController>().Rotate(Input.GetAxis("Mouse Y"));
         playerMovement.RotateServerRpc(Input.GetAxis("Mouse X"));
         playerMovement.MoveServerRpc(Input.GetAxis("Horizontal"),Input.GetAxis("Vertical"));
@@ -50,13 +50,8 @@ public class PlayerController : NetworkBehaviour
 
     }
 
-    private void PauseToggle() {
-        paused = !paused;
-        CursorLockUpdate();
-    }
-
     private void CursorLockUpdate() {
-        if (paused) {
+        if (GameObject.Find("GameManager").GetComponent<GameManager>().IsPaused()) {
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
         } else {

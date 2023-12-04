@@ -13,6 +13,10 @@ public class GameManager : NetworkBehaviour
     private NetworkVariable<int> seed = new NetworkVariable<int>(default,
     NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
+    private bool localPause = false;
+    private NetworkVariable<bool> globalPause = new NetworkVariable<bool>(true,
+    NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+
     void Start() {
         //makes this game object persistant throughout scene changes
         DontDestroyOnLoad(this.gameObject);
@@ -38,6 +42,7 @@ public class GameManager : NetworkBehaviour
     {
         //runs on host when the game scene first loads:
         if (sceneEvent.SceneEventType == SceneEventType.LoadEventCompleted && IsHost) {
+            globalPause.Value = false; //unpauses the game
             GameObject.Find("Terrain").GetComponent<TerrainGeneration>().GenerateTerrain();
             SpawnPlayerServerRpc(NetworkManager.Singleton.LocalClientId);
         }
@@ -55,6 +60,14 @@ public class GameManager : NetworkBehaviour
         player.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
     }
 
+    //returns if the game should be paused or not
+    public bool IsPaused() {
+        return globalPause.Value || localPause;
+    }
+    //toggles local pause
+    public void ToggleLocalPause() {
+        localPause = !localPause;
+    }
     //returns the seed for this game
     public int GetSeed() {
         return seed.Value;

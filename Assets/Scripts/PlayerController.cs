@@ -9,6 +9,10 @@ public class PlayerController : NetworkBehaviour
     private GameObject mainCamera;
     private PlayerMovement playerMovement;
 
+    //pause logic bools
+    private bool lastFrameEscape = false;
+    private bool paused = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -18,8 +22,7 @@ public class PlayerController : NetworkBehaviour
         playerMovement = GetComponent<PlayerMovement>();
 
         //sorts out the cursor
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
+        CursorLockUpdate();
 
         if (IsOwner) {
             playerMovement.RespawnServerRpc();
@@ -29,6 +32,14 @@ public class PlayerController : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
+        //pause logic, including rising edge
+        if ((Input.GetAxis("Escape") != 0f) && !lastFrameEscape) {
+            PauseToggle();
+        }
+        lastFrameEscape = (Input.GetAxis("Escape") != 0f);
+
+        if (paused) return; //return if paused
+        
         mainCamera.GetComponent<cameraController>().Rotate(Input.GetAxis("Mouse Y"));
         playerMovement.RotateServerRpc(Input.GetAxis("Mouse X"));
         playerMovement.MoveServerRpc(Input.GetAxis("Horizontal"),Input.GetAxis("Vertical"));
@@ -37,5 +48,20 @@ public class PlayerController : NetworkBehaviour
             playerMovement.JumpServerRpc();
         }
 
+    }
+
+    private void PauseToggle() {
+        paused = !paused;
+        CursorLockUpdate();
+    }
+
+    private void CursorLockUpdate() {
+        if (paused) {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+        } else {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+        }
     }
 }

@@ -5,11 +5,14 @@ using UnityEngine;
 public class cameraController : MonoBehaviour
 {
     [SerializeField] private float sensitivity;
+    [SerializeField] private float fov;
+    [SerializeField] private float zoom; 
 
     private float xRot;
 
     void Start() {
         xRot = transform.rotation.x;
+        ZoomOut();
     }
 
     // Rotates the camera up and down
@@ -21,5 +24,13 @@ public class cameraController : MonoBehaviour
 
         //aplies new rotation
         transform.rotation = Quaternion.Euler(xRot,oldEuler.y, oldEuler.z);
+    }
+
+    public void ZoomIn() {
+        Camera.main.fieldOfView = fov/zoom;
+    }
+    
+    public void ZoomOut() {
+        Camera.main.fieldOfView = fov;
     }
 }

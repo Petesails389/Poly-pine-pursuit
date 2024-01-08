@@ -38,7 +38,7 @@ public class TerrainGeneration : MonoBehaviour
 
         //populates the map
         foreach (ItemSet itemSet in itemSets){
-            GenerateItems(itemSet);
+            //GenerateItems(itemSet);
         }
 
         AdjustWalls(); //moves the walls to the edge of the allowed map

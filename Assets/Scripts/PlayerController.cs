@@ -8,17 +8,19 @@ public class PlayerController : NetworkBehaviour
 {
     private GameObject mainCamera;
     private PlayerMovement playerMovement;
+    private GameManager gameManager;
 
     //escape rising edge
     private bool lastFrameEscape = false;
 
     // Start is called before the first frame update
-    void Start()
+    public override void OnNetworkSpawn()
     {
 
         //find various objects and components
         mainCamera = GameObject.Find("Camera");
         playerMovement = GetComponent<PlayerMovement>();
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
         //sorts out the cursor
         CursorLockUpdate();
@@ -26,19 +28,34 @@ public class PlayerController : NetworkBehaviour
         if (IsOwner) {
             playerMovement.RespawnServerRpc();
         }
+        base.OnNetworkSpawn();
     }
+
 
     // Update is called once per frame
     void Update()
     {
         //pause logic, including rising edge
         if ((Input.GetAxis("Escape") != 0f) && !lastFrameEscape) {
-            GameObject.Find("GameManager").GetComponent<GameManager>().ToggleLocalPause();
-            CursorLockUpdate();
+            gameManager.ToggleLocalPause();
         }
         lastFrameEscape = (Input.GetAxis("Escape") != 0f);
 
-        if (GameObject.Find("GameManager").GetComponent<GameManager>().IsPaused()) return; //return if paused
+        if (gameManager.IsPaused()) return; //return if paused
+
+        //crosshair zoom
+        if (Input.GetAxis("Scope") != 0f) {
+            mainCamera.GetComponent<cameraController>().ZoomIn();
+        }
+        else {
+            mainCamera.GetComponent<cameraController>().ZoomOut();
+        }
+
+    }
+
+    // Used for movement code
+    private void FixedUpdate() {
+        if (gameManager.IsPaused()) return; //return if paused
 
         mainCamera.GetComponent<cameraController>().Rotate(Input.GetAxis("Mouse Y"));
         playerMovement.RotateServerRpc(Input.GetAxis("Mouse X"));
@@ -47,11 +64,10 @@ public class PlayerController : NetworkBehaviour
         if (Input.GetAxis("Jump") != 0f) {
             playerMovement.JumpServerRpc();
         }
-
     }
 
-    private void CursorLockUpdate() {
-        if (GameObject.Find("GameManager").GetComponent<GameManager>().IsPaused()) {
+    public void CursorLockUpdate() {
+        if (gameManager.IsPaused()) {
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
         } else {

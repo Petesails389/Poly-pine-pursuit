@@ -9,14 +9,14 @@ public class NetworkDisable : NetworkBehaviour
 
     //Class to disable movement and camera components for network object that don't belong to the current player
 
-    [SerializeField] private Camera cam;
+    [SerializeField] private GameObject cam;
 
     // Start is called before the first frame update
     void Start()
     {
         if (IsOwner) return;//doesn't do anything if the player is owned
 
-        cam.enabled = false;
+        cam.SetActive(false);
         cam.gameObject.tag = "Untagged";
         GetComponent<PlayerController>().enabled = false;
     }

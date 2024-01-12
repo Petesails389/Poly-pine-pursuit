@@ -1,14 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Netcode;
-using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Networking;
+using TMPro;
 
 public class GameUI : MonoBehaviour
 {
     [SerializeField] private GameObject pausePanel;
+    [SerializeField] private TMP_Text pauseText;
 
     [SerializeField] private Button quitButton;
     [SerializeField] private Button resumeButton;
@@ -18,7 +17,7 @@ public class GameUI : MonoBehaviour
     {
 
         quitButton.onClick.AddListener(()=> { 
-            GameObject.Find("GameManager").GetComponent<GameManager>().Quit();
+            GameObject.Find("GameManager").GetComponent<GameManager>().ClientStop();
         });
 
         resumeButton.onClick.AddListener(()=> {
@@ -30,7 +29,9 @@ public class GameUI : MonoBehaviour
 
     }
 
-    public void SetPause(bool state) {
-        pausePanel.SetActive(state);
+    public void SetPause(bool paused, bool resume = true, string msg = "Paused") {
+        pausePanel.SetActive(paused);
+        resumeButton.interactable = resume;
+        pauseText.text = msg;
     }
 }

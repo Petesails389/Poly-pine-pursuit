@@ -1,145 +1,254 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
-using UnityEngine.Networking;
-using Unity.Netcode;
-using UnityEngine.SceneManagement;
+using FishNet.Connection;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
+using FishNet.Managing.Scened;
 using UnityEngine.UI;
 
 public class GameManager : NetworkBehaviour
 {
-    [SerializeField] private GameObject playerPrefab;
+    [SyncVar] private int seed = 0;
+    private int readyPlayers;
 
-    private NetworkVariable<int> seed = new NetworkVariable<int>(default,
-    NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    [SerializeField] private GameUI gameUI; //reference to the gameUI script
+    [SerializeField] private MainMenuUI mainMenuUI; //reference to the Main Menu UI script
 
-    private bool localPause = true;
-    private NetworkVariable<bool> globalPause = new NetworkVariable<bool>(true,
-    NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    [SerializeField] private TerrainGeneration terrainGeneration; //reference to the terrain generation script
+    [SerializeField] private ConnectionManager connectionManager; //referecne to the connection manager
 
-    private GameUI gameUI; //reference to the gameUI script
+    [SerializeField] private int targetNumberOfPlayers; 
 
-    void Start() {
-        //makes this game object persistant throughout scene changes
-        DontDestroyOnLoad(this.gameObject);
+    private PlayerController playerController; //reference to the player controller of the local player
+
+    enum GameState {
+        None = 0,
+        Loading = 1,
+        Waiting = 2,
+        Paused = 3,
+        Playing = 4,
+        Scoring = 5,
+        Stopping = 6,
+        Restarting = 7
     }
 
-    public override void OnNetworkSpawn() {
-        //subscirbes to scene events
-        NetworkManager.Singleton.SceneManager.OnSceneEvent += SceneManager_OnSceneEvent;
-        //subscribes to global pause changes
-        globalPause.OnValueChanged += OnGlobalPauseChange;
+    private GameState currentGameState;
 
-        //insures all variables are as they should be
-        gameUI = null;
+    private void ChangeGameState(GameState state) {
+        currentGameState = state;
+        
+        switch (state) {
+            case GameState.None:
+                break;
+            case GameState.Loading:
+                StartLoading();
+                break;
+            case GameState.Waiting:
+                StartWaiting();
+                break;
+            case GameState.Paused:
+                StartPausing();
+                break;
+            case GameState.Playing:
+                StartPlaying();
+                break;
+            case GameState.Scoring:
+                break;
+            case GameState.Stopping:
+                StartStopping();
+                break;
+            case GameState.Restarting:
+                if (base.IsServer) readyPlayers = 0;
+                ChangeGameState(GameState.Loading); //start the game again
+                break;
 
-        if (IsHost) {
+        } 
+    }
+
+    private void StartWaiting() {
+        gameUI.SetPause(true,false,"Waiting for Players..."); //shows the pause UI
+        //unlocks the cursor
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+    }
+    
+    private void StartPlaying() {
+        gameUI.SetPause(false); //hides the pause UI
+        //locks the cursor
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+
+    private void StartPausing() {
+        gameUI.SetPause(true); //shows the pause UI
+        //unlocks the cursor
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+    }
+
+    private void StartLoading() {
+        //swaps the UI to the game UI
+        mainMenuUI.gameObject.SetActive(false);
+        gameUI.gameObject.SetActive(true);
+
+        if (base.IsServer) {
+            Debug.Log("randomising");
             //randomises the seed if this person is hosting
-            seed.Value = Random.Range(-100000,100000);
-            //Starts the main game scene
-            NetworkManager.Singleton.SceneManager.LoadScene("MainGame", LoadSceneMode.Single);
-
-            //calls the base
-            base.OnNetworkSpawn();
+            this.seed = UnityEngine.Random.Range(-100000,100000);
         }
 
-        if (IsClient) {
-            
+        terrainGeneration.GenerateTerrain(); //generate the terrain
+    }
+
+    private void FinishLoading() {
+        StartPausing(); //not actually pausing but the display should be the same for now
+        ClientReady();
+        ChangeGameState(GameState.Waiting);
+    }
+
+    [ObserversRpc]
+    private void StopWaiting() {
+        if (currentGameState == GameState.Waiting) {
+            ChangeGameState(GameState.Playing);
+        } 
+    }
+
+    private void WaitingCheck() {
+        if ((readyPlayers == targetNumberOfPlayers && currentGameState == GameState.Waiting) 
+        || currentGameState == GameState.Playing || currentGameState == GameState.Paused) {
+            StopWaiting();
         }
     }
 
-    //this is called by the netwwork sceneManager antime there is a scene event
-    private void SceneManager_OnSceneEvent(SceneEvent sceneEvent)
-    {
-        //runs on host when the game scene first loads:
-        if (sceneEvent.SceneEventType == SceneEventType.LoadEventCompleted && IsHost) {
-            gameUI = GameObject.Find("GameUI").GetComponent<GameUI>(); //find the UI
-            GameObject.Find("Terrain").GetComponent<TerrainGeneration>().GenerateTerrain(); //Generate the Terrain
-
-            //places the player, spawns its netowrk object and keeps a reference to it's controller
-            GameObject player = Instantiate(playerPrefab);
-            player.GetComponent<NetworkObject>().SpawnAsPlayerObject(NetworkManager.Singleton.LocalClientId);
-
-            globalPause.Value = true;
-            ToggleGlobalPauseServerRpc(); //unpauses the game
-            ToggleLocalPause();
-        }
-        //runs on the server when the game scene is loaded
-        if (sceneEvent.SceneEventType == SceneEventType.SynchronizeComplete && IsHost) {
-            GameObject player = Instantiate(playerPrefab);
-            player.GetComponent<NetworkObject>().SpawnAsPlayerObject(sceneEvent.ClientId);
-
-            //calls a client RPC on the client that just joined to do it's startup things 
-            ClientRpcParams clientRpcParams = new ClientRpcParams
-            {
-            Send = new ClientRpcSendParams
-            {
-                TargetClientIds = new ulong[]{sceneEvent.ClientId}
-            }
-            };
-
-            OnPlayerSpawnedClientRpc(clientRpcParams);
-
-        }
-        //runs on client when the game scene is synced
-        if (sceneEvent.SceneEventType == SceneEventType.SynchronizeComplete && !IsHost) {
-            GameObject.Find("Terrain").GetComponent<TerrainGeneration>().GenerateTerrain(); //Generate the terrain
+    private void StartStopping() {
+        if (base.IsServer) {
+            ServerStopRpc();
+        } else {
+            terrainGeneration.DestroyPopulation();
+            FinishStopping();
         }
     }
 
-    [ClientRpc]
-    //runs on client once the player has been spawned - this is when everything is now ready for the client to start - should be shortly after the scene sync completes
-    public void OnPlayerSpawnedClientRpc(ClientRpcParams clientRpcParams = default) {
-        if (IsOwner) return;
+    private  void FinishStopping() {
+        //swap the UI back
+        mainMenuUI.gameObject.SetActive(true);
+        gameUI.gameObject.SetActive(false);
 
-        gameUI = GameObject.Find("GameUI").GetComponent<GameUI>(); //find the UI
-        ToggleLocalPause(); //unpauses the game
-    }
-
-    //returns if the game should be paused or not
-    public bool IsPaused() {
-        return globalPause.Value || localPause;
+        connectionManager.StopNetwork();
+        ChangeGameState(GameState.None); //set the GameState back to null as the game is no longer running
     }
 
     //toggles local pause
     public void ToggleLocalPause() {
-        localPause = !localPause;
-        gameUI.SetPause(IsPaused());
-        NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerController>().CursorLockUpdate();
+        if (currentGameState == GameState.Playing) {
+            ChangeGameState(GameState.Paused);
+        } else if (currentGameState == GameState.Paused) {
+            ChangeGameState(GameState.Playing);
+        }
     }
 
-    //toggles globalPause
-    [ServerRpc]
-    private void ToggleGlobalPauseServerRpc() {
-        globalPause.Value = !globalPause.Value;
-    }
-
-    private void OnGlobalPauseChange(bool previous, bool current) {
-        gameUI.SetPause(IsPaused());
-        NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerController>().CursorLockUpdate();
-    }
-
-    //returns the seed for this game
+    //gets and sets for the seed value
     public int GetSeed() {
-        return seed.Value;
+        return seed;
     }
 
-    //handles Quitting the game
-    public void Quit() {
-        if (IsHost) {
-            DisconnectClientRpc(); //disconnects all clients
-        }
-        else {
-            //unless this is a client in which case
-            NetworkManager.Singleton.Shutdown();
-            SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+    [ServerRpc (RequireOwnership = false)]
+    public void SetSeed(GameManager script, int value) {
+        script.seed = value;
+    }
+
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        //starts loading the game scene
+        ChangeGameState(GameState.Loading);
+        //finds the local player
+        playerController = base.LocalConnection.FirstObject.gameObject.GetComponent<PlayerController>();
+        Debug.Log(playerController);
+        //no players are ready
+        if (base.IsServer) readyPlayers = 0;
+    }
+
+    //called once per frame
+    void Update() {
+        switch (currentGameState) {
+            case GameState.None:
+                break;
+            case GameState.Loading:
+                break;
+            case GameState.Waiting:
+                break;
+            case GameState.Paused:
+                playerController.PausedUpdateCall();
+                break;
+            case GameState.Playing:
+                playerController.PausedUpdateCall();
+                playerController.UpdateCall();
+                break;
+            case GameState.Scoring:
+                break;
+            case GameState.Stopping:
+                break;
+            case GameState.Restarting:
+                break;
         }
     }
 
-    //disconnects a player or client and loads the main menue scene
-    [ClientRpc]
-    public void DisconnectClientRpc(ClientRpcParams clientRpcParams = default) {
-        NetworkManager.Singleton.Shutdown();
-        SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+    //called at a fixed time interval
+    void FixedUpdate() {
+        switch (currentGameState) {
+            case GameState.None:
+                break;
+            case GameState.Loading:
+                break;
+            case GameState.Waiting:
+                break;
+            case GameState.Paused:
+                break;
+            case GameState.Playing:
+                playerController.MovementUpdateCall();
+                break;
+            case GameState.Scoring:
+                break;
+            case GameState.Stopping:
+                break;
+            case GameState.Restarting:
+                break;
+        }
+    }
+
+    public void OnTerrainGenerationFisnished() {
+        if (currentGameState != GameState.Loading) return; //if the game isn't loading don't finish loading it
+        FinishLoading();
+    }
+
+    //called to stop the game for all client
+    [ObserversRpc]
+    private void ClientStopRpc() {
+        if (currentGameState == GameState.Stopping) return; // if it's already stopping don't stop again
+        ChangeGameState(GameState.Stopping);
+    }
+
+    //called to stop the game for a single client
+    public void ClientStop() {
+        if (currentGameState == GameState.Stopping) return; // if it's already stopping don't stop again
+        ChangeGameState(GameState.Stopping);
+    }
+
+    //called to stop the game for all players 
+    [ServerRpc (RequireOwnership = false)]
+    private void ServerStopRpc() {
+        ClientStopRpc();
+        terrainGeneration.DestroyPopulation();
+        FinishStopping();
+    }
+
+    //called by each client ONCE and once only to announce that they are ready to start. when this is equal to the number of players excpected then the game starts
+    [ServerRpc (RequireOwnership = false)]
+    private void ClientReady() {
+        readyPlayers += 1;
+        WaitingCheck();
     }
 }

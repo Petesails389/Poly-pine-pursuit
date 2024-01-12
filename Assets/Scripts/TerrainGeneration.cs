@@ -1,8 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
-using UnityEngine.Networking;
-using Unity.Netcode;
 
 public class TerrainGeneration : MonoBehaviour
 {
@@ -27,8 +26,9 @@ public class TerrainGeneration : MonoBehaviour
 
     public void GenerateTerrain(){
         seed = GameObject.Find("GameManager").GetComponent<GameManager>().GetSeed();
+        Debug.Log(seed);
 
-        Random.InitState((int) seed);
+        UnityEngine.Random.InitState((int) seed);
         mesh = new Mesh();
         //generates a new terrain mesh
         GenerateMesh();
@@ -38,20 +38,23 @@ public class TerrainGeneration : MonoBehaviour
 
         //populates the map
         foreach (ItemSet itemSet in itemSets){
-            //GenerateItems(itemSet);
+            GenerateItems(itemSet);
         }
 
         AdjustWalls(); //moves the walls to the edge of the allowed map
+
+        //announce that terrain generation has finsihed:
+        GameObject.Find("GameManager").GetComponent<GameManager>().OnTerrainGenerationFisnished();
     }
 
     private void AdjustWalls() {
-        GameObject.Find("Wall1").transform.position += new Vector3(size/2,0,0);
+        GameObject.Find("Wall1").transform.position = new Vector3(size/2,0,0);
         GameObject.Find("Wall1").transform.localScale = new Vector3(size,100,1);
-        GameObject.Find("Wall2").transform.position += new Vector3(size/2,0,size);
+        GameObject.Find("Wall2").transform.position = new Vector3(size/2,0,size);
         GameObject.Find("Wall2").transform.localScale = new Vector3(size,100,1);
-        GameObject.Find("Wall3").transform.position += new Vector3(0,0,size/2);
+        GameObject.Find("Wall3").transform.position = new Vector3(0,0,size/2);
         GameObject.Find("Wall3").transform.localScale = new Vector3(size,100,1);
-        GameObject.Find("Wall4").transform.position += new Vector3(size,0,size/2);
+        GameObject.Find("Wall4").transform.position = new Vector3(size,0,size/2);
         GameObject.Find("Wall4").transform.localScale = new Vector3(size,100,1);
     }
 
@@ -97,7 +100,7 @@ public class TerrainGeneration : MonoBehaviour
     //generates items in the world
     private void GenerateItems(ItemSet itemSet) {
         for (int i = 0; i<((size*size*9)/itemSet.density); i++) {
-            PlaceItem(itemSet.items[Random.Range(0, itemSet.items.Length)], itemSet.offset);
+            PlaceItem(itemSet.items[UnityEngine.Random.Range(0, itemSet.items.Length)], itemSet.offset);
         }
     }
 
@@ -105,12 +108,12 @@ public class TerrainGeneration : MonoBehaviour
     private void PlaceItem(GameObject item, float offset)
     {
         Vector3[] vertices = mesh.vertices;
-        Vector3 vertex = vertices[Random.Range(0, vertices.Length)];
-        float rotation = Random.Range(0f, 360f);
-        Instantiate(item, vertex + new Vector3(0,-offset,0), Quaternion.AngleAxis(rotation, Vector3.up));
+        Vector3 vertex = vertices[UnityEngine.Random.Range(0, vertices.Length)];
+        float rotation = UnityEngine.Random.Range(0f, 360f);
+        Instantiate(item, vertex + new Vector3(0,-offset,0), Quaternion.AngleAxis(rotation, Vector3.up),transform.Find("Population"));
     }
 
-    //returns a point in space based of 3 layered noise maps and a random offset based of the seed
+    //returns a point in space based of 3 layered noise maps and a UnityEngine.Random offset based of the seed
     private Vector3 GetNewVertex(float x, float z) 
     {
         float newX = x + seed;
@@ -120,5 +123,12 @@ public class TerrainGeneration : MonoBehaviour
         float y3 = Mathf.PerlinNoise(newX * scale3,newZ * scale3)*scale3y;
         float y = y1+y2+y3;
         return new Vector3(x, y, z);
+    }
+
+    public void DestroyPopulation() {
+        Debug.Log("test");
+        foreach(Transform child in transform.Find("Population")) {
+            Destroy(child.gameObject);
+        }
     }
 }

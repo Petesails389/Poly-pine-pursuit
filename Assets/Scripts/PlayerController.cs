@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
-using Unity.Netcode;
+using FishNet.Connection;
+using FishNet.Object;
+
 
 public class PlayerController : NetworkBehaviour
 {
@@ -14,35 +15,44 @@ public class PlayerController : NetworkBehaviour
     private bool lastFrameEscape = false;
 
     // Start is called before the first frame update
-    public override void OnNetworkSpawn()
+    public override void OnStartClient()
     {
+        base.OnStartClient();
+        if (base.IsOwner) {
+            //sorts out the camera
+            mainCamera = Camera.main.gameObject;
+            mainCamera.transform.position = new Vector3(transform.position.x, transform.position.y + 1, transform.position.z);
+            mainCamera.transform.SetParent(transform.Find("Head"));
 
-        //find various objects and components
-        mainCamera = GameObject.Find("Camera");
-        playerMovement = GetComponent<PlayerMovement>();
-        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+            //sorts out object references
+            playerMovement = GetComponent<PlayerMovement>();
+            gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
-        //sorts out the cursor
-        CursorLockUpdate();
-
-        if (IsOwner) {
-            playerMovement.RespawnServerRpc();
+            //hides various player commonents that shoudl only be visible to other players
+            transform.Find("Body").GetComponent<Renderer>().enabled = false;
+            transform.Find("Head").GetComponent<Renderer>().enabled = false;
+            transform.Find("Head/Visor").GetComponent<Renderer>().enabled = false;
         }
-        base.OnNetworkSpawn();
+        else {
+            GetComponent<PlayerController>().enabled = false;
+        }
     }
 
 
-    // Update is called once per frame
-    void Update()
+    // PausedUpdateCall is called by the GameManager when in playing or paused GameState
+    // this is called before UpdateCall
+    public void PausedUpdateCall()
     {
         //pause logic, including rising edge
         if ((Input.GetAxis("Escape") != 0f) && !lastFrameEscape) {
             gameManager.ToggleLocalPause();
         }
         lastFrameEscape = (Input.GetAxis("Escape") != 0f);
+    }
 
-        if (gameManager.IsPaused()) return; //return if paused
-
+    // UpdateCall is called by the GameManager when in playing GameState
+    public void UpdateCall() 
+    {
         //crosshair zoom
         if (Input.GetAxis("Scope") != 0f) {
             mainCamera.GetComponent<cameraController>().ZoomIn();
@@ -53,26 +63,13 @@ public class PlayerController : NetworkBehaviour
 
     }
 
-    // Used for movement code
-    private void FixedUpdate() {
-        if (gameManager.IsPaused()) return; //return if paused
-
-        mainCamera.GetComponent<cameraController>().Rotate(Input.GetAxis("Mouse Y"));
-        playerMovement.RotateServerRpc(Input.GetAxis("Mouse X"));
+    // MovementUpdateCall is called by GameManager during the fixed update when in playing GameState
+    public void MovementUpdateCall() {
+        playerMovement.RotateServerRpc(Input.GetAxis("Mouse X"),Input.GetAxis("Mouse Y"));
         playerMovement.MoveServerRpc(Input.GetAxis("Horizontal"),Input.GetAxis("Vertical"));
 
         if (Input.GetAxis("Jump") != 0f) {
             playerMovement.JumpServerRpc();
-        }
-    }
-
-    public void CursorLockUpdate() {
-        if (gameManager.IsPaused()) {
-            Cursor.visible = true;
-            Cursor.lockState = CursorLockMode.None;
-        } else {
-            Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
         }
     }
 }

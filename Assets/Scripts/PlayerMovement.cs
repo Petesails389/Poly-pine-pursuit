@@ -1,17 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
-using Unity.Netcode;
+using FishNet.Connection;
+using FishNet.Object;
 
 public class PlayerMovement : NetworkBehaviour
 {
     [SerializeField] private float sensitivity;
     [SerializeField] private float speed;
     [SerializeField] private float jumpForce;
-    [SerializeField] private Vector3 spawnPoint = new Vector3(50,50,50); //default respawn position roughly in the middle of a medium sized map for testting purposes
 
     private bool isGrounded;
+    private float xRotation;
+    private float yRotation;
 
     //this is triggered anytime the ground check touches anything 
     void OnTriggerEnter(Collider other)
@@ -23,10 +24,19 @@ public class PlayerMovement : NetworkBehaviour
 
     // Rotates the camera up and down
     [ServerRpc]
-    public void RotateServerRpc(float rotation)
+    public void RotateServerRpc(float y, float x)
     {
-        float calculatedRotation = rotation*sensitivity; // calcuates how much to rotate by
-        transform.Rotate(new Vector3(0,calculatedRotation,0));
+        float calculatedRotationX = -1*x*sensitivity; // calcuates how much to rotate by
+        float calculatedRotationY = y*sensitivity; // calcuates how much to rotate by
+
+        xRotation = Mathf.Clamp(xRotation + calculatedRotationX,-90f,90f); //calculates new roation
+        yRotation = yRotation + calculatedRotationY;
+        
+        Vector3 oldEuler = transform.Find("Head").rotation.eulerAngles; //gets the current rotation
+        transform.Find("Head").rotation = Quaternion.Euler(xRotation,oldEuler.y,oldEuler.z);
+
+        oldEuler = transform.rotation.eulerAngles; //gets the current rotation
+        transform.rotation = Quaternion.Euler(oldEuler.x,yRotation,oldEuler.z);
     }
 
     //move function takes in values between 1 and -1
@@ -46,12 +56,5 @@ public class PlayerMovement : NetworkBehaviour
             GetComponent<Rigidbody>().AddForce(0,jumpForce,0,ForceMode.Impulse);
             isGrounded = false;
         }
-    }
-
-    //respawns the player. is called at start and on player death
-    [ServerRpc]
-    public void RespawnServerRpc()
-    {
-        transform.position = spawnPoint;
     }
 }

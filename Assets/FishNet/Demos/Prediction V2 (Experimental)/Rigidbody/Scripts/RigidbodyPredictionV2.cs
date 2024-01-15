@@ -16,7 +16,6 @@ namespace FishNet.PredictionV2
     {
 #if PREDICTION_V2
 
-
         public struct MoveData : IReplicateData
         {
             public bool Jump;
@@ -97,8 +96,7 @@ namespace FishNet.PredictionV2
 
         private MoveData BuildMoveData()
         {
-
-            if (!base.IsOwner)
+            if (!IsOwner && Owner.IsValid)
                 return default;
 
             float horizontal = Input.GetAxisRaw("Horizontal");
@@ -109,36 +107,20 @@ namespace FishNet.PredictionV2
             return md;
         }
 
-        private MoveData _lastData;
 
         [ReplicateV2]
         private void Move(MoveData md, ReplicateState state = ReplicateState.Invalid, Channel channel = Channel.Unreliable)
         {
-
-            //if (!base.IsOwner)
+            //if (state == ReplicateState.Future)
             //{
-            //    if (state == ReplicateState.ReplayedPredicted || state == ReplicateState.Predicted)
-            //    {
-            //        uint tick = md.GetTick();
-            //        md = _lastData;
-            //        md.SetTick(tick);
-            //    }
-            //    else
-            //    {
-            //        _lastData = md;
-            //    }
+            //    /* Reduce velocity slightly. This will be slightly less accurate if
+            //     * the object continues to move in the same direction but can drastically
+            //     * reduce jarring visuals if the object changes path rather than predicted(future)
+            //     * forward. */
+            //    _rigidbody.velocity *= 0.65f;
+            //    _rigidbody.angularVelocity *= 0.65f;
+            //    return;
             //}
-            //if (base.IsOwner && state != ReplicateState.UserCreated && state != ReplicateState.ReplayedUserCreated)
-            //  Debug.LogError($"SDFSD  " + md.GetTick());
-            /* If predicted input via replay then slow down velocity.
-             * This prevents potential overshooting if the object were to change
-             * direction. If your rigidbody has a substantial amount of drag or is
-             * likely to continue in the same direction this likely is not needed.
-             * 
-             * This is not a requirement by any means but rather a modification for
-             * this demo scene/game type. */
-            //if (state == ReplicateState.ReplayedPredicted || state == ReplicateState.Predicted)
-            //    _rigidbody.velocity *= 0.75f;
 
             Vector3 forces = new Vector3(md.Horizontal, 0f, md.Vertical) * _moveRate;
             _rigidbody.AddForce(forces);
@@ -153,7 +135,7 @@ namespace FishNet.PredictionV2
         {
             /* The base.IsServer check is not required but does save a little
             * performance by not building the reconcileData if not server. */
-            if (IsServer)
+            if (IsServerStarted)
             {
                 ReconcileData rd = new ReconcileData(transform.position, transform.rotation, _rigidbody.velocity, _rigidbody.angularVelocity);
                 Reconciliation(rd);

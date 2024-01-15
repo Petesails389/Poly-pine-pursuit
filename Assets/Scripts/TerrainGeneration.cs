@@ -26,7 +26,6 @@ public class TerrainGeneration : MonoBehaviour
 
     public void GenerateTerrain(){
         seed = GameObject.Find("GameManager").GetComponent<GameManager>().GetSeed();
-        Debug.Log(seed);
 
         UnityEngine.Random.InitState((int) seed);
         mesh = new Mesh();

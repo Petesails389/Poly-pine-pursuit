@@ -59,7 +59,7 @@ public class ConnectionManager : MonoBehaviour
     }
 
     private void StartStopping() {
-        if (FishNet.InstanceFinder.NetworkManager.IsServer) {
+        if (FishNet.InstanceFinder.NetworkManager.IsServerStarted) {
             //stop the server if it is one
             FishNet.InstanceFinder.NetworkManager.ServerManager.StopConnection(true);
         } else {
@@ -84,7 +84,7 @@ public class ConnectionManager : MonoBehaviour
 
     private void OnRemoteConnectionState(NetworkConnection connection, RemoteConnectionStateArgs remoteState) {
         //called when someone connects or disconnects
-        if (!FishNet.InstanceFinder.NetworkManager.IsServer) return; //return if they are not the server
+        if (!FishNet.InstanceFinder.NetworkManager.IsServerStarted) return; //return if they are not the server
         if (currentState == State.Running) {
             //if the server is running
             if (remoteState.ConnectionState == RemoteConnectionState.Started) {
@@ -96,7 +96,7 @@ public class ConnectionManager : MonoBehaviour
     private void OnClientConnectionChange(ClientConnectionStateArgs clientState){
         if (clientState.ConnectionState == LocalConnectionState.Started) {
             ChangeState(State.Running); //after client connected the system is running
-            if (FishNet.InstanceFinder.NetworkManager.IsServer) {
+            if (FishNet.InstanceFinder.NetworkManager.IsServerStarted) {
             }
         } else if (clientState.ConnectionState == LocalConnectionState.Stopped) {
             ChangeState(State.Stopping); //after the client disconnects stop the server

@@ -113,7 +113,7 @@ namespace FishNet.Managing.Observing
 
             /* If to update spawned as well then update all networkobservers
              * with the setting and also update renderers. */
-            if (_networkManager.IsServer && HostVisibilityUpdateContains(updateType, HostVisibilityUpdateTypes.Spawned))
+            if (_networkManager.IsServerStarted && HostVisibilityUpdateContains(updateType, HostVisibilityUpdateTypes.Spawned))
             {
                 NetworkConnection clientConn = _networkManager.ClientManager.Connection;
                 foreach (NetworkObject n in _networkManager.ServerManager.Objects.Spawned.Values)
@@ -235,7 +235,6 @@ namespace FishNet.Managing.Observing
         internal void CalculateLevelOfDetail(uint tick)
         {
             
-
             //If here then index is 0 and interval is every tick.
             LevelOfDetailIndex = 0;
         }
@@ -245,6 +244,9 @@ namespace FishNet.Managing.Observing
         /// </summary>
         private void ValidateLevelOfDetails()
         {
+#if !FISHNET_PRO
+            _enableNetworkLod = false;
+#endif
             
         }
 

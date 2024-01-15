@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 public class GameManager : NetworkBehaviour
 {
-    [SyncVar] private int seed = 0;
+    private readonly SyncVar<int> seed = new();
     private int readyPlayers;
 
     [SerializeField] private GameUI gameUI; //reference to the gameUI script
@@ -60,7 +60,7 @@ public class GameManager : NetworkBehaviour
                 StartStopping();
                 break;
             case GameState.Restarting:
-                if (base.IsServer) readyPlayers = 0;
+                if (base.IsServerInitialized) readyPlayers = 0;
                 ChangeGameState(GameState.Loading); //start the game again
                 break;
 
@@ -93,10 +93,9 @@ public class GameManager : NetworkBehaviour
         mainMenuUI.gameObject.SetActive(false);
         gameUI.gameObject.SetActive(true);
 
-        if (base.IsServer) {
-            Debug.Log("randomising");
+        if (base.IsServerInitialized) {
             //randomises the seed if this person is hosting
-            this.seed = UnityEngine.Random.Range(-100000,100000);
+            seed.Value = UnityEngine.Random.Range(-100000,100000);
         }
 
         terrainGeneration.GenerateTerrain(); //generate the terrain
@@ -123,7 +122,7 @@ public class GameManager : NetworkBehaviour
     }
 
     private void StartStopping() {
-        if (base.IsServer) {
+        if (base.IsServerInitialized) {
             ServerStopRpc();
         } else {
             terrainGeneration.DestroyPopulation();
@@ -149,14 +148,9 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    //gets and sets for the seed value
+    //get the seed value
     public int GetSeed() {
-        return seed;
-    }
-
-    [ServerRpc (RequireOwnership = false)]
-    public void SetSeed(GameManager script, int value) {
-        script.seed = value;
+        return seed.Value;
     }
 
     public override void OnStartClient()
@@ -166,57 +160,8 @@ public class GameManager : NetworkBehaviour
         ChangeGameState(GameState.Loading);
         //finds the local player
         playerController = base.LocalConnection.FirstObject.gameObject.GetComponent<PlayerController>();
-        Debug.Log(playerController);
         //no players are ready
-        if (base.IsServer) readyPlayers = 0;
-    }
-
-    //called once per frame
-    void Update() {
-        switch (currentGameState) {
-            case GameState.None:
-                break;
-            case GameState.Loading:
-                break;
-            case GameState.Waiting:
-                break;
-            case GameState.Paused:
-                playerController.PausedUpdateCall();
-                break;
-            case GameState.Playing:
-                playerController.PausedUpdateCall();
-                playerController.UpdateCall();
-                break;
-            case GameState.Scoring:
-                break;
-            case GameState.Stopping:
-                break;
-            case GameState.Restarting:
-                break;
-        }
-    }
-
-    //called at a fixed time interval
-    void FixedUpdate() {
-        switch (currentGameState) {
-            case GameState.None:
-                break;
-            case GameState.Loading:
-                break;
-            case GameState.Waiting:
-                break;
-            case GameState.Paused:
-                break;
-            case GameState.Playing:
-                playerController.MovementUpdateCall();
-                break;
-            case GameState.Scoring:
-                break;
-            case GameState.Stopping:
-                break;
-            case GameState.Restarting:
-                break;
-        }
+        if (base.IsServerInitialized) readyPlayers = 0;
     }
 
     public void OnTerrainGenerationFisnished() {
@@ -250,5 +195,13 @@ public class GameManager : NetworkBehaviour
     private void ClientReady() {
         readyPlayers += 1;
         WaitingCheck();
+    }
+
+    public bool IsPaused() {
+        if (currentGameState == GameState.Playing) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }

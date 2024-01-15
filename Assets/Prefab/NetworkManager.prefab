@@ -12,8 +12,7 @@ GameObject:
   - component: {fileID: 7443408887813606050}
   - component: {fileID: 934570884}
   - component: {fileID: 7443408887813606060}
-  - component: {fileID: 2621504546507505537}
-  - component: {fileID: 7802263943966097376}
+  - component: {fileID: 5070272932785843956}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -86,9 +85,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerPrefab: {fileID: -3330872960007989464, guid: 0f06cfa22c918844784161a83e4c93fb, type: 3}
   _addToDefaultScene: 1
-  Spawns:
-  - {fileID: 0}
---- !u!114 &2621504546507505537
+  Spawns: []
+--- !u!114 &5070272932785843956
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -107,22 +105,3 @@ MonoBehaviour:
   _redundancyCount: 3
   _allowPredictedSpawning: 0
   _reservedObjectIds: 15
---- !u!114 &7802263943966097376
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7443408887813606051}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3fdaae44044276a49a52229c1597e33b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _updateOrder: 0
-  _timingType: 0
-  _allowTickDropping: 0
-  _maximumFrameTicks: 2
-  _tickRate: 30
-  _pingInterval: 1
-  _physicsMode: 1

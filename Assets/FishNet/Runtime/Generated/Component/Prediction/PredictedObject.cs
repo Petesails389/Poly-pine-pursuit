@@ -305,11 +305,11 @@ namespace FishNet.Component.Prediction
         }
 
         public override void OnStartNetwork()
-        {           
+        {
             /* If host then initialize owner smoother.
              * Host will use owner smoothing settings for more
              * accurate results. */
-            if (base.IsHost)
+            if (base.IsHostInitialized)
                 InitializeSmoother(true);
 
             UpdateRigidbodiesCount(true);
@@ -336,7 +336,7 @@ namespace FishNet.Component.Prediction
              * owner smoother. The owner smoother
              * is not predictive and is preferred
              * for more real time graphical results. */
-            if (base.IsOwner && !base.IsServer)
+            if (base.IsOwner && !base.IsServerStarted)
             {
                 /* If has prediction methods implement for owner,
                  * otherwise implement for spectator. */
@@ -358,7 +358,7 @@ namespace FishNet.Component.Prediction
         }
 
         public override void OnStopNetwork()
-        {          
+        {
             ChangeSubscriptions(false);
             UpdateRigidbodiesCount(false);
             base.TimeManager.OnPostTick -= TimeManager_OnPostTick;
@@ -438,7 +438,7 @@ namespace FishNet.Component.Prediction
                 base.TimeManager.OnUpdate += TimeManager_OnUpdate;
                 base.TimeManager.OnPreTick += TimeManager_OnPreTick;
                 //Only client will use these events.
-                if (!base.IsServer)
+                if (!base.IsServerStarted)
                 {
                     base.PredictionManager.OnPreReplicateReplay += PredictionManager_OnPreReplicateReplay;
                     base.PredictionManager.OnPostReplicateReplay += PredictionManager_OnPostReplicateReplay;
@@ -452,7 +452,7 @@ namespace FishNet.Component.Prediction
                 base.TimeManager.OnUpdate -= TimeManager_OnUpdate;
                 base.TimeManager.OnPreTick -= TimeManager_OnPreTick;
                 //Only client will use these events.
-                if (!base.IsServer)
+                if (!base.IsServerStarted)
                 {
                     base.PredictionManager.OnPreReplicateReplay -= PredictionManager_OnPreReplicateReplay;
                     base.PredictionManager.OnPostReplicateReplay -= PredictionManager_OnPostReplicateReplay;
@@ -553,17 +553,25 @@ namespace FishNet.Component.Prediction
             if (!IsRigidbodyPrediction)
                 return;
 
+            bool warn = false;
             _rigidbodyPauser = new RigidbodyPauser();
             if (_predictionType == PredictionType.Rigidbody)
             {
+                if (_rigidbody.isKinematic)
+                    warn = true;
                 _rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
                 _rigidbodyPauser.UpdateRigidbodies(transform, RigidbodyType.Rigidbody, true, _graphicalObject);
             }
             else
             {
+                if (_rigidbody2d.isKinematic || !_rigidbody2d.simulated)
+                    warn = true;
                 _rigidbody2d.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
                 _rigidbodyPauser.UpdateRigidbodies(transform, RigidbodyType.Rigidbody2D, true, _graphicalObject);
             }
+
+            if (warn)
+                base.NetworkManager.LogWarning($"When using Kinematic or non-simulated rigidbodies you typically will want to use {nameof(PredictionType.Other)} and synchronize to spectators with a {nameof(NetworkTransform)}.");
         }
 
         /// <summary>

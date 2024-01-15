@@ -11,7 +11,7 @@ using FishNet.Serializing;
 using FishNet.Transporting;
 using FishNet.Utility.Extension;
 using FishNet.Utility.Performance;
-using GameKit.Utilities;
+using GameKit.Dependencies.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,15 +62,6 @@ namespace FishNet.Managing.Server
 
         #region Serialized.
         /// <summary>
-        /// Authenticator for this ServerManager. May be null if not using authentication.
-        /// </summary>
-        [Obsolete("Use GetAuthenticator and SetAuthenticator.")] //Remove on 2023/06/01
-        public Authenticator Authenticator
-        {
-            get => GetAuthenticator();
-            set => SetAuthenticator(value);
-        }
-        /// <summary>
         /// Gets the Authenticator for this manager.
         /// </summary>
         /// <returns></returns>
@@ -115,7 +106,7 @@ namespace FishNet.Managing.Server
         /// SyncTypeRate cannot yet be changed at runtime because this would require recalculating rates on SyncBase, which is not yet implemented.
         /// </summary>
         /// <returns></returns>
-        internal float GetSynctypeRate() => _syncTypeRate;
+        internal float GetSyncTypeRate() => _syncTypeRate;
         [Tooltip("Default send rate for SyncTypes. A value of 0f will send changed values every tick.")]
         [Range(0f, 60f)]
         [SerializeField]
@@ -148,7 +139,7 @@ namespace FishNet.Managing.Server
         /// <summary>
         /// True to share the Ids of clients and the objects they own with other clients. No sensitive information is shared.
         /// </summary>
-        internal bool ShareIds => _shareIds;
+        public bool ShareIds => _shareIds;
         [Tooltip("True to share the Ids of clients and the objects they own with other clients. No sensitive information is shared.")]
         [SerializeField]
         private bool _shareIds = true;
@@ -341,7 +332,7 @@ namespace FishNet.Managing.Server
                 return;
 #endif
             //Wait two timing intervals to give packets a chance to come through.
-            if (NetworkManager.SceneManager.IsIteratingQueue(TimeManager.TIMING_INTERVAL * 2f))
+            if (NetworkManager.SceneManager.IsIteratingQueue(2f))
                 return;
 
             float unscaledTime = Time.unscaledTime;
@@ -501,7 +492,10 @@ namespace FishNet.Managing.Server
             {
                 Transport t = NetworkManager.TransportManager.GetTransport(args.TransportIndex);
                 string tName = (t == null) ? "Unknown" : t.GetType().Name;
-                Debug.Log($"Local server is {state.ToString().ToLower()} for {tName}.");
+                string socketInformation = string.Empty;
+                if (state == LocalConnectionState.Starting)
+                    socketInformation = $" Listening on port {t.GetPort()}.";
+                Debug.Log($"Local server is {state.ToString().ToLower()} for {tName}.{socketInformation}");
             }
 
             NetworkManager.UpdateFramerate();
@@ -640,7 +634,7 @@ namespace FishNet.Managing.Server
             Reader.DataSource dataSource = Reader.DataSource.Client;
             reader = ReaderPool.Retrieve(segment, NetworkManager, dataSource);
             uint tick = reader.ReadTickUnpacked();
-            NetworkManager.TimeManager.SetLastPacketTick(tick);
+            NetworkManager.TimeManager.LastPacketTick.Update(tick);
             /* This is a special condition where a message may arrive split.
             * When this occurs buffer each packet until all packets are
             * received. */
@@ -652,7 +646,7 @@ namespace FishNet.Managing.Server
                 int expectedMessages;
                 _splitReader.GetHeader(reader, out expectedMessages);
                 //If here split message can be written.
-                _splitReader.Write(NetworkManager.TimeManager.LastPacketTick, reader, expectedMessages);
+                _splitReader.Write(NetworkManager.TimeManager.LastPacketTick.LastRemoteTick, reader, expectedMessages);
 
                 /* If fullMessage returns 0 count then the split
                  * has not written fully yet. Otherwise, if there is
@@ -705,6 +699,7 @@ namespace FishNet.Managing.Server
                     Kick(args.ConnectionId, KickReason.UnexpectedProblem, LoggingType.Error, $"ConnectionId {args.ConnectionId} not found within Clients. Connection will be kicked immediately.");
                     return;
                 }
+                conn.TryUpdateLocalTick(tick);
                 conn.PacketTick.Update(NetworkManager.TimeManager, tick, Timing.EstimatedTick.OldTickOption.SetLastRemoteTick);
                 /* If connection isn't authenticated and isn't a broadcast
                  * then disconnect client. If a broadcast then process

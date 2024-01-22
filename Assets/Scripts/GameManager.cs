@@ -23,7 +23,7 @@ public class GameManager : NetworkBehaviour
 
     private PlayerController playerController; //reference to the player controller of the local player
 
-    enum GameState {
+    public enum GameState {
         None = 0,
         Loading = 1,
         Waiting = 2,
@@ -34,9 +34,9 @@ public class GameManager : NetworkBehaviour
         Restarting = 7
     }
 
-    private GameState currentGameState;
+    public GameState currentGameState;
 
-    private void ChangeGameState(GameState state) {
+    public void ChangeGameState(GameState state) {
         currentGameState = state;
         
         switch (state) {
@@ -135,6 +135,9 @@ public class GameManager : NetworkBehaviour
         mainMenuUI.gameObject.SetActive(true);
         gameUI.gameObject.SetActive(false);
 
+        Camera.main.transform.SetParent(null); //saves the camera from being destroyed when the player character is destroyed
+        Camera.main.transform.rotation = Quaternion.Euler(0,0,0);
+
         connectionManager.StopNetwork();
         ChangeGameState(GameState.None); //set the GameState back to null as the game is no longer running
     }
@@ -195,13 +198,5 @@ public class GameManager : NetworkBehaviour
     private void ClientReady() {
         readyPlayers += 1;
         WaitingCheck();
-    }
-
-    public bool IsPaused() {
-        if (currentGameState == GameState.Playing) {
-            return false;
-        } else {
-            return true;
-        }
     }
 }

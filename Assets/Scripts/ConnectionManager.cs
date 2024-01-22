@@ -53,19 +53,19 @@ public class ConnectionManager : MonoBehaviour
     }
 
     private void StartDisconecting() {
-        Camera.main.transform.SetParent(null); //saves the camera from being destroyed when the player character is destroyed
-        Camera.main.transform.rotation = Quaternion.Euler(0,0,0);
         FishNet.InstanceFinder.NetworkManager.ClientManager.StopConnection();
     }
 
     private void StartStopping() {
-        if (FishNet.InstanceFinder.NetworkManager.IsServerStarted) {
-            //stop the server if it is one
-            FishNet.InstanceFinder.NetworkManager.ServerManager.StopConnection(true);
-        } else {
-            //if not it must be stopped already so set current state to stopped
+        if (!FishNet.InstanceFinder.NetworkManager.IsServerStarted) {
+            //if not a server it must be stopped already so set current state to stopped
             ChangeState(State.Stopped);
         }
+    }
+
+    private void FinishStopping() {
+        FishNet.InstanceFinder.NetworkManager.ServerManager.StopConnection(true);
+        ChangeState(State.Stopped);
     }
 
     void Start () {
@@ -85,11 +85,11 @@ public class ConnectionManager : MonoBehaviour
     private void OnRemoteConnectionState(NetworkConnection connection, RemoteConnectionStateArgs remoteState) {
         //called when someone connects or disconnects
         if (!FishNet.InstanceFinder.NetworkManager.IsServerStarted) return; //return if they are not the server
-        if (currentState == State.Running) {
-            //if the server is running
-            if (remoteState.ConnectionState == RemoteConnectionState.Started) {
-                //and someone just connected
-            }
+        if (currentState == State.Stopping 
+        && remoteState.ConnectionState == RemoteConnectionState.Stopped 
+        && FishNet.InstanceFinder.NetworkManager.ServerManager.Clients.Count == 0) {
+            //if the server is stopping and the last person just discconected
+            FinishStopping();
         }
     }
 

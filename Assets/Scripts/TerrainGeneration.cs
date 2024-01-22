@@ -125,7 +125,6 @@ public class TerrainGeneration : MonoBehaviour
     }
 
     public void DestroyPopulation() {
-        Debug.Log("test");
         foreach(Transform child in transform.Find("Population")) {
             Destroy(child.gameObject);
         }

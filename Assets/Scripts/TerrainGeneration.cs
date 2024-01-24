@@ -24,8 +24,9 @@ public class TerrainGeneration : MonoBehaviour
     //the seed to be used
     int seed;
 
-    public void GenerateTerrain(){
-        seed = GameObject.Find("GameManager").GetComponent<GameManager>().GetSeed();
+    public void GenerateTerrain(int _seed, float _size){
+        seed = _seed;
+        size = _size;
 
         UnityEngine.Random.InitState((int) seed);
         mesh = new Mesh();
@@ -47,14 +48,14 @@ public class TerrainGeneration : MonoBehaviour
     }
 
     private void AdjustWalls() {
-        GameObject.Find("Wall1").transform.position = new Vector3(size/2,0,0);
-        GameObject.Find("Wall1").transform.localScale = new Vector3(size,100,1);
-        GameObject.Find("Wall2").transform.position = new Vector3(size/2,0,size);
-        GameObject.Find("Wall2").transform.localScale = new Vector3(size,100,1);
-        GameObject.Find("Wall3").transform.position = new Vector3(0,0,size/2);
-        GameObject.Find("Wall3").transform.localScale = new Vector3(size,100,1);
-        GameObject.Find("Wall4").transform.position = new Vector3(size,0,size/2);
-        GameObject.Find("Wall4").transform.localScale = new Vector3(size,100,1);
+        GameObject.Find("Wall1").transform.position = new Vector3(0, 0, -size / 2);
+        GameObject.Find("Wall1").transform.localScale = new Vector3(size, 100, 1);
+        GameObject.Find("Wall2").transform.position = new Vector3(0, 0, size / 2);
+        GameObject.Find("Wall2").transform.localScale = new Vector3(size, 100, 1);
+        GameObject.Find("Wall3").transform.position = new Vector3(-size / 2, 0, 0);
+        GameObject.Find("Wall3").transform.localScale = new Vector3(size, 100, 1);
+        GameObject.Find("Wall4").transform.position = new Vector3(size / 2, 0, 0);
+        GameObject.Find("Wall4").transform.localScale = new Vector3(size, 100, 1);
     }
 
 
@@ -64,9 +65,9 @@ public class TerrainGeneration : MonoBehaviour
         List<int> triangles = new List<int>();
 
         //populates veticies array
-       for (float x = -size; x < size*2; x += resolution)
+       for (float x = size*-1.5f; x < size*1.5f; x += resolution)
         {
-            for (float z = -size; z < size*2; z += resolution)
+            for (float z = size*-1.5f; z < size*1.5f; z += resolution)
             {
                 //add the verticies for the first triangle
                 vertices.Add(GetNewVertex(x+1,z));

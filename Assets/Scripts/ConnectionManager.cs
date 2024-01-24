@@ -61,6 +61,13 @@ public class ConnectionManager : MonoBehaviour
             //if not a server it must be stopped already so set current state to stopped
             ChangeState(State.Stopped);
         }
+        else if (currentState == State.Stopping
+        && FishNet.InstanceFinder.NetworkManager.ServerManager.Clients.Count == 0)
+        {
+            //if the server is stopping and none is connected shutdown the server
+            FinishStopping();
+        }
+        //if clients are still connected wait for the callbacks signalling that all clients have discconected
     }
 
     private void FinishStopping() {

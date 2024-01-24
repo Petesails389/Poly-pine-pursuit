@@ -11,6 +11,7 @@ using UnityEngine.UI;
 public class GameManager : NetworkBehaviour
 {
     private readonly SyncVar<int> seed = new();
+    private readonly SyncVar<float> syncSize = new();
     private int readyPlayers;
 
     [SerializeField] private GameUI gameUI; //reference to the gameUI script
@@ -19,7 +20,8 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private TerrainGeneration terrainGeneration; //reference to the terrain generation script
     [SerializeField] private ConnectionManager connectionManager; //referecne to the connection manager
 
-    [SerializeField] private int targetNumberOfPlayers; 
+    [SerializeField] private int targetNumberOfPlayers;
+    [SerializeField] private float size;
 
     private PlayerController playerController; //reference to the player controller of the local player
 
@@ -96,9 +98,10 @@ public class GameManager : NetworkBehaviour
         if (base.IsServerInitialized) {
             //randomises the seed if this person is hosting
             seed.Value = UnityEngine.Random.Range(-100000,100000);
+            syncSize.Value = size;
         }
 
-        terrainGeneration.GenerateTerrain(); //generate the terrain
+        terrainGeneration.GenerateTerrain(seed.Value, syncSize.Value); //generate the terrain
     }
 
     private void FinishLoading() {
@@ -151,11 +154,6 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    //get the seed value
-    public int GetSeed() {
-        return seed.Value;
-    }
-
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -198,5 +196,10 @@ public class GameManager : NetworkBehaviour
     private void ClientReady() {
         readyPlayers += 1;
         WaitingCheck();
+    }
+
+    public float GetSize()
+    {
+        return syncSize.Value;
     }
 }

@@ -48,12 +48,13 @@ MonoBehaviour:
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: 30808185924078555}
   _networkObjectCache: {fileID: 30808185924078555}
-  seed: 0
   gameUI: {fileID: 0}
   mainMenuUI: {fileID: 0}
   terrainGeneration: {fileID: 0}
   connectionManager: {fileID: 0}
   targetNumberOfPlayers: 1
+  size: 50
+  currentGameState: 0
 --- !u!114 &30808185924078555
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -71,17 +72,25 @@ MonoBehaviour:
   <PredictedSpawn>k__BackingField: {fileID: 0}
   _networkBehaviours:
   - {fileID: 5341810174240568918}
-  <ParentNetworkObject>k__BackingField: {fileID: 0}
-  <ChildNetworkObjects>k__BackingField: []
+  <SerializedRootNetworkBehaviour>k__BackingField: {fileID: 0}
+  <NestedRootNetworkBehaviours>k__BackingField: []
   SerializedTransformProperties:
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
     LocalScale: {x: 1, y: 1, z: 1}
   _isNetworked: 1
+  _isSpawnable: 1
   _isGlobal: 0
   _initializeOrder: 0
   _defaultDespawnType: 0
   NetworkObserver: {fileID: 0}
+  _enablePrediction: 0
+  _predictionType: 0
+  _graphicalObject: {fileID: 0}
+  _enableStateForwarding: 1
+  _ownerInterpolation: 1
+  _enableTeleport: 0
+  _teleportThreshold: 1
   <PrefabId>k__BackingField: 0
   <SpawnableCollectionId>k__BackingField: 0
   _scenePathHash: 3351705117

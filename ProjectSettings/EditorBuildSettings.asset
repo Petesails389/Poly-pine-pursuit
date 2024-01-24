@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MainGame.unity
     guid: d0bcc8775055c9c4e93e74ab502e4f4f
+  - enabled: 0
+    path: Assets/FishNet/Demos/Prediction V2 (Experimental)/CharacterController/PredictionV2_CC.unity
+    guid: 941f6f8cbac7e9d418ffc6f22ee9359f
   m_configObjects: {}

@@ -65,9 +65,9 @@ public class TerrainGeneration : MonoBehaviour
         List<int> triangles = new List<int>();
 
         //populates veticies array
-       for (float x = size*-1.5f; x < size*1.5f; x += resolution)
+       for (float x = -size-25f; x < size+25f; x += resolution)
         {
-            for (float z = size*-1.5f; z < size*1.5f; z += resolution)
+            for (float z = -size-25f; z < size+25f; z += resolution)
             {
                 //add the verticies for the first triangle
                 vertices.Add(GetNewVertex(x+1,z));

@@ -53,7 +53,7 @@ MonoBehaviour:
   terrainGeneration: {fileID: 0}
   connectionManager: {fileID: 0}
   targetNumberOfPlayers: 1
-  size: 50
+  size: 100
   currentGameState: 0
 --- !u!114 &30808185924078555
 MonoBehaviour:

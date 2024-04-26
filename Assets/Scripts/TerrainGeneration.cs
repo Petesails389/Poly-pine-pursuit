@@ -6,16 +6,16 @@ using UnityEngine;
 public class TerrainGeneration : MonoBehaviour
 {
     
-    [SerializeField] private float size;
+    [SerializeField] private float size=50f;
     [SerializeField] private float resolution = 0.5f;
 
-    [SerializeField] private float scale1;
-    [SerializeField] private float scale2;
-    [SerializeField] private float scale3;
+    [SerializeField] private float scale1=0.0008f;
+    [SerializeField] private float scale2=0.04f;
+    [SerializeField] private float scale3=0.1f;
 
-    [SerializeField] private float scale1y;
-    [SerializeField] private float scale2y;
-    [SerializeField] private float scale3y;
+    [SerializeField] private float scale1y=12f;
+    [SerializeField] private float scale2y=4f;
+    [SerializeField] private float scale3y=1f;
 
     [SerializeField] private ItemSet[] itemSets;
 
@@ -38,7 +38,7 @@ public class TerrainGeneration : MonoBehaviour
 
         //populates the map
         foreach (ItemSet itemSet in itemSets){
-            GenerateItems(itemSet);
+            //GenerateItems(itemSet);
         }
 
         AdjustWalls(); //moves the walls to the edge of the allowed map
@@ -99,7 +99,9 @@ public class TerrainGeneration : MonoBehaviour
 
     //generates items in the world
     private void GenerateItems(ItemSet itemSet) {
-        for (int i = 0; i<((size*size*9)/itemSet.density); i++) {
+        //density is an abritary "percentage" where 100% is one item every 5X5 square
+        //Times 4 is temporary to adjust for the fact that the generated area is 4 times the size of the actual size
+        for (int i = 0; i<((size*size*4)*(itemSet.density/2500)); i++) {
             PlaceItem(itemSet.items[UnityEngine.Random.Range(0, itemSet.items.Length)], itemSet.offset);
         }
     }

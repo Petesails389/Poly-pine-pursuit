@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6141366263030315662}
   m_Layer: 0
   m_Name: Boulder_Large02
-  m_TagString: Ground
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -91,7 +91,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6484037506201307100}
-  m_Material: {fileID: 13400000, guid: 970cf013fba465a408131a7b620bc455, type: 2}
+  m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4

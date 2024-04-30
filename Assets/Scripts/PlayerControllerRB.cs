@@ -37,13 +37,15 @@ public class PlayerControllerRB : NetworkBehaviour
     {
         public RigidbodyState RigidbodyState;
         public PredictionRigidbody PredictionRigidbody;
-        public Quaternion Rotation;
+        public bool IsGrounded;
+        public Vector2 HeadRotation;
         
-        public ReconcileData(PredictionRigidbody pr, Quaternion _rotation)
+        public ReconcileData(PredictionRigidbody pr, bool _isGrounded, Vector2 _headRotation)
         {
             RigidbodyState = new RigidbodyState(pr.Rigidbody);
             PredictionRigidbody = pr;
-            Rotation = _rotation;
+            IsGrounded = _isGrounded;
+            HeadRotation = _headRotation;
             _tick = 0;
         }
 
@@ -57,12 +59,13 @@ public class PlayerControllerRB : NetworkBehaviour
     [Tooltip("X/Z being forward/backwards and straifing and Y being jump velocity.")] 
     private Vector3 moveSpeed = new Vector3(15,15,15);
     [SerializeField] private float acceleration = 15f;
-    [SerializeField] private float _sensitivity = 15f;
+    [SerializeField] private float sensitivity = 15f;
 
     private PredictionRigidbody PredictionRigidbody { get; set; } = new();
     private bool _jump;
     private bool lastFrameEscape;
     private bool isGrounded = false;
+    private Vector2 headRotation = new Vector2();
 
     //OBJECT/component REFERENCES
     private GameManager gameManager;
@@ -96,7 +99,7 @@ public class PlayerControllerRB : NetworkBehaviour
         GameObject mainCamera = Camera.main.gameObject;
         mainCamera.transform.position = new Vector3(transform.position.x, transform.position.y + 0.7f, transform.position.z);
         mainCamera.transform.SetParent(transform);
-        mainCamera.transform.SetParent(transform.Find("Prediction"));
+        mainCamera.transform.SetParent(transform.Find("Prediction/Head"));
     }
 
     public override void OnStopNetwork()
@@ -135,14 +138,12 @@ public class PlayerControllerRB : NetworkBehaviour
     {  
         //if it hit the floor then it's grounded
         if (other.tag == "Ground") isGrounded = true;
-        if (IsOwner || IsServerInitialized) Debug.Log(isGrounded, gameObject);
     }
 
     private void NetworkCollisionExit(Collider other)
     {
         //if it had been hitting the floor and isn't anymore then it's no longer grounded
         if (other.tag == "Ground") isGrounded = false;
-        if (IsOwner || IsServerInitialized) Debug.Log(isGrounded, gameObject);
     }
     
     private MoveData BuildMoveData()
@@ -166,7 +167,7 @@ public class PlayerControllerRB : NetworkBehaviour
         * performance by not building the reconcileData if not server. */
         if (IsServerInitialized)
         {
-            ReconcileData rd = new ReconcileData(PredictionRigidbody, transform.rotation);
+            ReconcileData rd = new ReconcileData(PredictionRigidbody, isGrounded, headRotation);
             Reconciliation(rd);
         }
     }
@@ -179,11 +180,16 @@ public class PlayerControllerRB : NetworkBehaviour
         //calculate speed
         float speed = (float) Math.Sqrt(velocity.x * velocity.x + velocity.z * velocity.z);
 
-        //rotate the player
-        Vector3 oldEuler = transform.rotation.eulerAngles;
-        float calculatedRotationY = (float) (md.Yaw*_sensitivity); // calcuates how much to rotate by
-        float yHeadRotation = oldEuler.y + calculatedRotationY;
-        transform.rotation = Quaternion.Euler(oldEuler.x, yHeadRotation, oldEuler.z);
+        //calculate rotations
+        float calculatedRotationY = (float) (md.Yaw*sensitivity);
+        float calculatedRotationX = (float) (md.Pitch*sensitivity);
+        calculatedRotationX = Mathf.Clamp(headRotation.x - calculatedRotationX,-90f,90f) - headRotation.x; //clamp the pitch
+        headRotation += new Vector2(calculatedRotationX, calculatedRotationY);
+        
+        //apply the rotations
+        transform.rotation = Quaternion.Euler(0, headRotation.y, 0);
+        Vector3 oldEuler = transform.Find("Prediction/Head").rotation.eulerAngles;
+        transform.Find("Prediction/Head").rotation = Quaternion.Euler(headRotation.x, oldEuler.y, oldEuler.z);
 
         //move the player in x and z
         float x = md.Horizontal * (moveSpeed.x - speed);
@@ -194,10 +200,7 @@ public class PlayerControllerRB : NetworkBehaviour
         //jump logic
         if (md.Jump && isGrounded)
         {
-            //isGrounded = false;
-            GetComponent<Rigidbody>().velocity = new Vector3(velocity.x, moveSpeed.y, velocity.z);
-            //PredictionRigidbody.Velocity(xyz);
-            if (IsOwner || IsServerInitialized) Debug.Log("jump");
+            PredictionRigidbody.Velocity(new Vector3(velocity.x, moveSpeed.y, velocity.z));
         }
 
         //Add gravity to make the object fall faster.
@@ -216,6 +219,12 @@ public class PlayerControllerRB : NetworkBehaviour
         PredictionRigidbody.Reconcile(rd.PredictionRigidbody);
 
         //reconcile rotation
-        transform.rotation = rd.Rotation;
+        headRotation = rd.HeadRotation;
+        //apply the rotations
+        transform.rotation = Quaternion.Euler(0, headRotation.y, 0);
+        transform.Find("Prediction/Head").rotation = Quaternion.Euler(headRotation.x, headRotation.y, 0);
+
+        //reconcile grounded
+        isGrounded = rd.IsGrounded;
     }
 }

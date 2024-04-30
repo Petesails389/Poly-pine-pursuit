@@ -62,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 717627bcfb058b94a814c91e253e77d9, type: 2}
+  - {fileID: 2100000, guid: f4ab281b964d8864790e3b30f9414a53, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -111,7 +111,7 @@ GameObject:
   - component: {fileID: 8898925746528106721}
   - component: {fileID: 3707725527343897247}
   - component: {fileID: 5469128161374105528}
-  - component: {fileID: 6198138910325422734}
+  - component: {fileID: 3817751115695445286}
   m_Layer: 0
   m_Name: Player RB
   m_TagString: Player
@@ -152,7 +152,7 @@ MonoBehaviour:
   <PredictedSpawn>k__BackingField: {fileID: 0}
   _networkBehaviours:
   - {fileID: 3707725527343897247}
-  - {fileID: 6198138910325422734}
+  - {fileID: 3817751115695445286}
   <SerializedRootNetworkBehaviour>k__BackingField: {fileID: 0}
   <NestedRootNetworkBehaviours>k__BackingField: []
   SerializedTransformProperties:
@@ -171,8 +171,8 @@ MonoBehaviour:
   _enableStateForwarding: 1
   _networkTransform: {fileID: 0}
   _ownerInterpolation: 1
-  _enableTeleport: 0
-  _teleportThreshold: 4
+  _enableTeleport: 1
+  _teleportThreshold: 5
   <PrefabId>k__BackingField: 8
   <SpawnableCollectionId>k__BackingField: 0
   _scenePathHash: 0
@@ -185,7 +185,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1521648109655792252}
-  m_Material: {fileID: 13400000, guid: 7be74e3a51192294f81788184d43f2c2, type: 2}
+  m_Material: {fileID: 13400000, guid: 7f4d89425db6fc44d9189dd2e3d571b3, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.4
@@ -226,7 +226,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
---- !u!114 &6198138910325422734
+--- !u!114 &3817751115695445286
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -235,15 +235,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1521648109655792252}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b05a4e84213bb15449f67827ea625923, type: 3}
+  m_Script: {fileID: 11500000, guid: 4737b5302ea40ef43b38712a8ba81683, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _componentIndexCache: 1
   _addedNetworkObject: {fileID: -3330872960007989464}
   _networkObjectCache: {fileID: -3330872960007989464}
-  moveSpeed: {x: 15, y: 20, z: 15}
-  acceleration: 20
-  _sensitivity: 15
+  moveSpeed: {x: 15, y: 30, z: 15}
+  acceleration: 15
+  _sensitivity: 5
 --- !u!1 &2658915635801351009
 GameObject:
   m_ObjectHideFlags: 0
@@ -305,7 +305,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 717627bcfb058b94a814c91e253e77d9, type: 2}
+  - {fileID: 2100000, guid: f4ab281b964d8864790e3b30f9414a53, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -421,7 +421,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 3665853fd6c260a469738a1eede8e3f1, type: 2}
+  - {fileID: 2100000, guid: 3a5ec20f6eb0b0e4299253decb0d4af0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

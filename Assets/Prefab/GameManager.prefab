@@ -45,15 +45,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18ca5e09b05d13b45b7c13e6486a18d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 255
+  _componentIndexCache: 0
   _addedNetworkObject: {fileID: 30808185924078555}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 30808185924078555}
   gameUI: {fileID: 0}
   mainMenuUI: {fileID: 0}
   terrainGeneration: {fileID: 0}
   connectionManager: {fileID: 0}
   targetNumberOfPlayers: 1
-  size: 50
+  size: 99
   currentGameState: 0
 --- !u!114 &30808185924078555
 MonoBehaviour:
@@ -70,7 +70,8 @@ MonoBehaviour:
   <IsNested>k__BackingField: 0
   <ComponentIndex>k__BackingField: 0
   <PredictedSpawn>k__BackingField: {fileID: 0}
-  _networkBehaviours: []
+  _networkBehaviours:
+  - {fileID: 5341810174240568918}
   <SerializedRootNetworkBehaviour>k__BackingField: {fileID: 0}
   <NestedRootNetworkBehaviours>k__BackingField: []
   SerializedTransformProperties:

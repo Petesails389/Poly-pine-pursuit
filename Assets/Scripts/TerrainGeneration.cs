@@ -183,7 +183,7 @@ public class TerrainGeneration : MonoBehaviour
         float height = 0;
         float hillFactor = (Mathf.PerlinNoise(newX * noiseLayers[0].x,newZ * noiseLayers[0].x) - 0.25f) * noiseLayers[0].y;
         float lastNoise = Mathf.PerlinNoise(newX * noiseLayers[1].x,newZ * noiseLayers[1].x);
-        lastNoise = lastNoise * lastNoise;
+        lastNoise = lastNoise * lastNoise * lastNoise;
 
         foreach (Vector2 layer in noiseLayers) {
             float noiseOutput = Mathf.PerlinNoise(newX * layer.x,newZ * layer.x);

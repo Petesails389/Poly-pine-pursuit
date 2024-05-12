@@ -101,9 +101,15 @@ public class PlayerController : NetworkBehaviour
 
     private void TimeManager_OnTick() 
     {
-        if (!base.IsOwner || gameManager.currentGameState == GameManager.GameState.Paused) return;
+        if (!base.IsOwner) return;
+
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
+
+        if (gameManager.currentGameState == GameManager.GameState.Paused) {
+            horizontal = 0;
+            vertical = 0;
+        }
 
         //get velocity
         Vector3 localVelocity = transform.InverseTransformDirection(rb.velocity);

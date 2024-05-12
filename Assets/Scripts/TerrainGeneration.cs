@@ -9,21 +9,29 @@ public class TerrainGeneration : MonoBehaviour
     [SerializeField] private float chunkSize=50f;
     [SerializeField] private float resolution = 0.5f;
 
-    [SerializeField] private float scale1=0.0008f;
-    [SerializeField] private float scale2=0.04f;
-    [SerializeField] private float scale3=0.1f;
-
-    [SerializeField] private float scale1y=12f;
-    [SerializeField] private float scale2y=4f;
-    [SerializeField] private float scale3y=1f;
+    /// <summary>
+    /// x is the scale and y in th height of the noise layers
+    /// value that i've found work....
+    /// (0.002, 2)
+    /// (0.008,40)
+    /// (0.01,12)
+    /// (0.05,4)
+    /// (0.1,1)
+    /// </summary>
+    [SerializeField] private Vector2 colourNoise; 
+    [SerializeField] private Vector2[] noiseLayers;
 
     [SerializeField] private GameObject chunkTemplate;
     [SerializeField] private ItemSet[] itemSets;
+
+    [SerializeField] private Gradient gradient;
 
     //the seed to be used
     int seed;
     //the total size of the map
     float size;
+
+    private List<GameObject> chunks = new List<GameObject>();
 
     public void GenerateTerrain(int _seed, float _size){
         seed = _seed;
@@ -36,7 +44,7 @@ public class TerrainGeneration : MonoBehaviour
         {
             for (int z = -1 * edgeNumber; z <= edgeNumber; z++)
             {
-                GenerateChunk(new Vector2(x, z));
+                chunks.Add(GenerateChunk(new Vector2(x, z)));
             }
         }
 
@@ -46,20 +54,27 @@ public class TerrainGeneration : MonoBehaviour
         GameObject.Find("GameManager").GetComponent<GameManager>().OnTerrainGenerationFisnished();
     }
 
-    public void GenerateChunk(Vector2 chunkPosition)
+    public GameObject GenerateChunk(Vector2 chunkPosition)
     {
         //adjust the chunk position
         chunkPosition = chunkPosition *chunkSize;
 
-        //generates a new terrain mesh
-        Mesh mesh = new Mesh();
-        mesh = GenerateMesh(mesh, chunkPosition);
-        
         //spawn in a new chunk
         GameObject newChunk = Instantiate(chunkTemplate, new Vector3(chunkPosition.x, 0, chunkPosition.y), Quaternion.identity, transform.Find("Chunks"));
+        //refresh the chunk
+        RefreshChunk(newChunk);
+
+        return newChunk;
+    }
+
+    public void RefreshChunk(GameObject chunk) {
+        //generates a new terrain mesh
+        Mesh mesh = new Mesh();
+        mesh = GenerateMesh(mesh, chunk.transform.position);
+
         //applies the new mesh to the components that need it
-        newChunk.GetComponent<MeshFilter>().mesh = mesh;
-        newChunk.GetComponent<MeshCollider>().sharedMesh = mesh;
+        chunk.GetComponent<MeshFilter>().mesh = mesh;
+        chunk.GetComponent<MeshCollider>().sharedMesh = mesh;
 
 
         //setup the random
@@ -72,27 +87,31 @@ public class TerrainGeneration : MonoBehaviour
 
     private void AdjustWalls() {
         GameObject.Find("Walls/Wall1").transform.position = new Vector3(0, 0, -size / 2);
-        GameObject.Find("Walls/Wall1").transform.localScale = new Vector3(size, 100, 1);
+        GameObject.Find("Walls/Wall1").transform.localScale = new Vector3(size, 300, 1);
         GameObject.Find("Walls/Wall2").transform.position = new Vector3(0, 0, size / 2);
-        GameObject.Find("Walls/Wall2").transform.localScale = new Vector3(size, 100, 1);
+        GameObject.Find("Walls/Wall2").transform.localScale = new Vector3(size, 300, 1);
         GameObject.Find("Walls/Wall3").transform.position = new Vector3(-size / 2, 0, 0);
-        GameObject.Find("Walls/Wall3").transform.localScale = new Vector3(size, 100, 1);
+        GameObject.Find("Walls/Wall3").transform.localScale = new Vector3(size, 300, 1);
         GameObject.Find("Walls/Wall4").transform.position = new Vector3(size / 2, 0, 0);
-        GameObject.Find("Walls/Wall4").transform.localScale = new Vector3(size, 100, 1);
+        GameObject.Find("Walls/Wall4").transform.localScale = new Vector3(size, 300, 1);
     }
 
 
-    private Mesh GenerateMesh(Mesh mesh, Vector2 _offset)
+    private Mesh GenerateMesh(Mesh mesh, Vector3 offset)
     {
         List<Vector3> vertices = new List<Vector3>();
         List<int> triangles = new List<int>();
+        List<Color> colours = new List<Color>();
 
         //clalculates an intSize - number of vertex wide
         int intSize = (int)(chunkSize/resolution) + 1;
         //calculates exact resolution
         float newResolution = (float)chunkSize/((int)(chunkSize/resolution));
-        //makes a vector3 offset
-        Vector3 offset = new Vector3 (_offset.x, 0, _offset.y);
+        //calculates max possible height
+        float maxHeight = 0;
+        foreach (Vector2 layer in noiseLayers) {
+            maxHeight += layer.y;
+        }
 
         //populates veticies array
         for (float x = chunkSize * -0.5f; x <= chunkSize * 0.5f; x += newResolution)
@@ -100,9 +119,15 @@ public class TerrainGeneration : MonoBehaviour
             for (float z = chunkSize * -0.5f; z <= chunkSize * 0.5f; z += newResolution)
             {
                 //add a new vertex
-                vertices.Add(GetNewVertex(x + offset.x, z + offset.z) - offset);
+                Vector3 newVertex = GetNewVertex(x + offset.x, z + offset.z) - offset;
+                vertices.Add(newVertex);
+
+                //calculate the colour
+                float colourHeight = (newVertex.y / maxHeight) + (Mathf.PerlinNoise((x + offset.x) * colourNoise.x,(z + offset.z) * colourNoise.x)-0.5f) * colourNoise.y;
+                colours.Add(gradient.Evaluate(colourHeight));
             }
         }
+        
         for (int x = 0; x < intSize -1; x++)
         {
             for (int z = 0; z < intSize -1; z++)
@@ -125,6 +150,7 @@ public class TerrainGeneration : MonoBehaviour
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         mesh.vertices = vertices.ToArray();
         mesh.triangles = triangles.ToArray();
+        mesh.colors = colours.ToArray();
         mesh.RecalculateNormals();
 
         return mesh;
@@ -148,16 +174,23 @@ public class TerrainGeneration : MonoBehaviour
         Instantiate(item, vertex + new Vector3(0,-offset,0), Quaternion.AngleAxis(rotation, Vector3.up),transform.Find("Population"));
     }
 
-    //returns a point in space based of 3 layered noise maps and a UnityEngine.Random offset based of the seed
+    //returns a point in space based off layered noise maps and a UnityEngine.Random offset based of the seed
     private Vector3 GetNewVertex(float x, float z) 
     {
         float newX = x + seed;
         float newZ = z + seed;
-        float y1 = Mathf.PerlinNoise(newX * scale1,newZ * scale1)*scale1y;
-        float y2 = Mathf.PerlinNoise(newX * scale2,newZ * scale2)*scale2y;
-        float y3 = Mathf.PerlinNoise(newX * scale3,newZ * scale3)*scale3y;
-        float y = y1+y2+y3;
-        return new Vector3(x, y, z);
+
+        float height = 0;
+        float hillFactor = (Mathf.PerlinNoise(newX * noiseLayers[0].x,newZ * noiseLayers[0].x) - 0.25f) * noiseLayers[0].y;
+        float lastNoise = Mathf.PerlinNoise(newX * noiseLayers[1].x,newZ * noiseLayers[1].x);
+        lastNoise = lastNoise * lastNoise;
+
+        foreach (Vector2 layer in noiseLayers) {
+            float noiseOutput = Mathf.PerlinNoise(newX * layer.x,newZ * layer.x);
+            height +=  noiseOutput * lastNoise * layer.y * hillFactor;
+            lastNoise = noiseOutput;
+        }
+        return new Vector3(x, height, z);
     }
 
     public void DestroyPopulation() {

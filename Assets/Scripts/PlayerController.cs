@@ -10,10 +10,10 @@ using System;
 
 public class PlayerController : NetworkBehaviour
 {
-    [SerializeField]
-    [Tooltip("X/Z being forward/backwards and straifing and Y being jump velocity.")] 
-    private Vector3 moveSpeed = new Vector3(15,15,15);
-    [SerializeField] private float acceleration = 15f;
+    [SerializeField] private float sprintSpeed = 12;
+    [SerializeField] private float moveSpeed = 7.5f;
+    [SerializeField] private float crouchSpeed = 3;
+    [SerializeField] private float jumpSpeed = 15;
     [SerializeField] private float sensitivity = 15f;
 
     private bool lastFrameEscape;
@@ -30,8 +30,8 @@ public class PlayerController : NetworkBehaviour
     {
         networkCollision = GetComponent<NetworkCollision>(); //find network collider
         // Subscribe to the desired collision event
-        networkCollision.OnEnter += NetworkCollisionEnter;
-        networkCollision.OnExit += NetworkCollisionExit;
+        //networkCollision.OnEnter += NetworkCollisionEnter;
+        //networkCollision.OnExit += NetworkCollisionExit;
     }
 
     public override void OnStartNetwork()
@@ -60,16 +60,18 @@ public class PlayerController : NetworkBehaviour
         mainCamera.transform.SetParent(transform.Find("Head"));
     }
 
-    private void NetworkCollisionEnter(Collider other)
+    private void OnCollisionEnter(Collision other)
     {  
         //if it hit the floor then it's grounded
-        if (other.tag == "Ground") isGrounded = true;
+        if (other.collider.tag == "Ground") isGrounded = true;
+        Debug.Log(other);
     }
 
-    private void NetworkCollisionExit(Collider other)
+    private void OnCollisionExit(Collision other)
     {
         //if it had been hitting the floor and isn't anymore then it's no longer grounded
-        if (other.tag == "Ground") isGrounded = false;
+        if (other.collider.tag == "Ground") isGrounded = false;
+        Debug.Log(other);
     }
 
     private void Update()
@@ -103,25 +105,28 @@ public class PlayerController : NetworkBehaviour
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
 
-         //get velocity
-        Vector3 velocity = rb.velocity;
-        //calculate speed
-        float speed = (float) Math.Sqrt(velocity.x * velocity.x + velocity.z * velocity.z);
+        //get velocity
+        Vector3 localVelocity = transform.InverseTransformDirection(rb.velocity);
 
-        //move the player in x and z
-        float x = horizontal * (moveSpeed.x - speed);
-        float z = vertical * (moveSpeed.z - speed);
-        Vector3 forces = new Vector3(x, 0, z) * acceleration;
-        rb.AddRelativeForce(forces);
+        //decide on walk speed
+        float speed = moveSpeed;
+        if (Input.GetAxis("Crouch") != 0f) {
+            speed = crouchSpeed;
+        } else if (Input.GetAxis("Sprint") != 0f) {
+            speed = sprintSpeed;
+        }
+
+        //move the player
+        rb.velocity = transform.TransformDirection(new Vector3(horizontal * speed, rb.velocity.y, vertical * speed));
 
         //jump logic
         if (Input.GetAxis("Jump") != 0f && isGrounded)
         {
-            rb.velocity = new Vector3(velocity.x, moveSpeed.y, velocity.z);
+            rb.velocity = new Vector3(rb.velocity.x, jumpSpeed, rb.velocity.z);
         }
 
         //Add gravity to make the object fall faster.
-        //rb.AddForce(Physics.gravity * 4f);
+        rb.AddForce(Physics.gravity * 3f);
     }
 
 }

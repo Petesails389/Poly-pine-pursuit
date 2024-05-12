@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 40152826697462176}
   - component: {fileID: 5503272941317498507}
   - component: {fileID: 6243649894684173795}
-  - component: {fileID: 81052778252655208}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -31,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 1966847098071539434}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4927738810478163423}
@@ -102,7 +101,6 @@ MonoBehaviour:
   _networkBehaviours:
   - {fileID: 131378755138315993}
   - {fileID: 6243649894684173795}
-  - {fileID: 81052778252655208}
   <SerializedRootNetworkBehaviour>k__BackingField: {fileID: 0}
   <NestedRootNetworkBehaviours>k__BackingField: []
   SerializedTransformProperties:
@@ -150,8 +148,8 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1966847098071539434}
   serializedVersion: 2
-  m_Mass: 70
-  m_Drag: 0.1
+  m_Mass: 100
+  m_Drag: 0
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
@@ -173,27 +171,11 @@ MonoBehaviour:
   _componentIndexCache: 1
   _addedNetworkObject: {fileID: 6148651912291488540}
   _networkObjectCache: {fileID: 6148651912291488540}
-  moveSpeed: {x: 15, y: 5, z: 15}
-  acceleration: 40
+  sprintSpeed: 12
+  moveSpeed: 7.5
+  crouchSpeed: 3
+  jumpSpeed: 7
   sensitivity: 15
---- !u!114 &81052778252655208
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1966847098071539434}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40bcde17fa5e03f44b87f9963ac281b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _componentIndexCache: 2
-  _addedNetworkObject: {fileID: 6148651912291488540}
-  _networkObjectCache: {fileID: 6148651912291488540}
-  _maximumSimultaneousHits: 16
-  _historyDuration: 0.5
-  _additionalSize: 0.1
 --- !u!1 &4100357729367756645
 GameObject:
   m_ObjectHideFlags: 0

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1905909883480286695}
   m_Layer: 0
   m_Name: ChunkTemplate
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -76,7 +76,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a9703cc4760f77c43a0d93554ed1f6a2, type: 2}
+  - {fileID: 2100000, guid: 4c6c0bb2ee6a5854e9b66567b3b52bdb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

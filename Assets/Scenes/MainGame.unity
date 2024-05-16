@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2037.543, g: 2037.8838, b: 3250.1953, a: 1}
+  m_IndirectSpecularColor: {r: 6595.6875, g: 8172.375, b: 10816.609, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -532,7 +532,7 @@ Light:
   m_LightShadowCasterMode: 2
   m_AreaSize: {x: 0.5, y: 0.5}
   m_BounceIntensity: 1
-  m_ColorTemperature: 15461
+  m_ColorTemperature: 6710
   m_UseColorTemperature: 1
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 353.5534}
   m_UseBoundingSphereOverride: 0
@@ -2398,6 +2398,42 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3749609956081674728, guid: a8c88d75817c68a4787ddc754b102e11, type: 3}
+      propertyPath: gradient.ctime2
+      value: 1137
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749609956081674728, guid: a8c88d75817c68a4787ddc754b102e11, type: 3}
+      propertyPath: gradient.ctime5
+      value: 38569
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749609956081674728, guid: a8c88d75817c68a4787ddc754b102e11, type: 3}
+      propertyPath: gradient.ctime6
+      value: 41018
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749609956081674728, guid: a8c88d75817c68a4787ddc754b102e11, type: 3}
+      propertyPath: gradient.key4.b
+      value: 0.24150932
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749609956081674728, guid: a8c88d75817c68a4787ddc754b102e11, type: 3}
+      propertyPath: gradient.key4.g
+      value: 0.24150932
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749609956081674728, guid: a8c88d75817c68a4787ddc754b102e11, type: 3}
+      propertyPath: gradient.key4.r
+      value: 0.24150932
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749609956081674728, guid: a8c88d75817c68a4787ddc754b102e11, type: 3}
+      propertyPath: gradient.key5.b
+      value: 0.24905652
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749609956081674728, guid: a8c88d75817c68a4787ddc754b102e11, type: 3}
+      propertyPath: gradient.key5.g
+      value: 0.24905652
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749609956081674728, guid: a8c88d75817c68a4787ddc754b102e11, type: 3}
+      propertyPath: gradient.key5.r
+      value: 0.24905652
+      objectReference: {fileID: 0}
     - target: {fileID: 3749609956081674728, guid: a8c88d75817c68a4787ddc754b102e11, type: 3}
       propertyPath: noiseLayers.Array.data[0].x
       value: 0.001

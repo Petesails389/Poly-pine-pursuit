@@ -2,7 +2,11 @@
     "m_SGVersion": 3,
     "m_Type": "UnityEditor.ShaderGraph.GraphData",
     "m_ObjectId": "903444f562d34af4b139e661d4a76fbe",
-    "m_Properties": [],
+    "m_Properties": [
+        {
+            "m_Id": "ad9d2b3423574b00a6057bf984c02d2b"
+        }
+    ],
     "m_Keywords": [],
     "m_Dropdowns": [],
     "m_CategoryData": [
@@ -49,6 +53,9 @@
         },
         {
             "m_Id": "af11d998fb694ec290f8bf766948641e"
+        },
+        {
+            "m_Id": "c3da26fc0f764d84893e05e217cb99c6"
         }
     ],
     "m_GroupDatas": [],
@@ -71,7 +78,7 @@
         {
             "m_OutputSlot": {
                 "m_Node": {
-                    "m_Id": "af11d998fb694ec290f8bf766948641e"
+                    "m_Id": "c3da26fc0f764d84893e05e217cb99c6"
                 },
                 "m_SlotId": 0
             },
@@ -85,8 +92,8 @@
     ],
     "m_VertexContext": {
         "m_Position": {
-            "x": 0.0,
-            "y": 0.0
+            "x": -0.000011832904419861734,
+            "y": 0.0000019128501662635246
         },
         "m_Blocks": [
             {
@@ -401,10 +408,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -409.1999816894531,
+            "x": -450.79998779296877,
             "y": 199.99998474121095,
-            "width": 208.7999725341797,
-            "height": 279.199951171875
+            "width": 208.79995727539063,
+            "height": 279.20001220703127
         }
     },
     "m_Slots": [
@@ -761,6 +768,21 @@
 {
     "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId": "8d01207112da469da416b766de42c279",
+    "m_Id": 0,
+    "m_DisplayName": "Smoothness",
+    "m_SlotType": 1,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "Out",
+    "m_StageCapability": 3,
+    "m_Value": 0.0,
+    "m_DefaultValue": 0.0,
+    "m_Labels": []
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
     "m_ObjectId": "99e691aacfe94cb2b51ae27cc6be0305",
     "m_Id": 0,
     "m_DisplayName": "Smoothness",
@@ -771,6 +793,33 @@
     "m_Value": 0.10000000149011612,
     "m_DefaultValue": 0.5,
     "m_Labels": []
+}
+
+{
+    "m_SGVersion": 1,
+    "m_Type": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty",
+    "m_ObjectId": "ad9d2b3423574b00a6057bf984c02d2b",
+    "m_Guid": {
+        "m_GuidSerialized": "e8dba61a-c18e-49d4-8ade-fe4148cb5d9c"
+    },
+    "m_Name": "Smoothness",
+    "m_DefaultRefNameVersion": 1,
+    "m_RefNameGeneratedByDisplayName": "Smoothness",
+    "m_DefaultReferenceName": "_Smoothness",
+    "m_OverrideReferenceName": "",
+    "m_GeneratePropertyBlock": true,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
+    "m_Precision": 0,
+    "overrideHLSLDeclaration": false,
+    "hlslDeclarationOverride": 0,
+    "m_Hidden": false,
+    "m_Value": 0.0,
+    "m_FloatType": 0,
+    "m_RangeValues": {
+        "x": 0.0,
+        "y": 1.0
+    }
 }
 
 {
@@ -877,6 +926,41 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.PropertyNode",
+    "m_ObjectId": "c3da26fc0f764d84893e05e217cb99c6",
+    "m_Group": {
+        "m_Id": ""
+    },
+    "m_Name": "Property",
+    "m_DrawState": {
+        "m_Expanded": true,
+        "m_Position": {
+            "serializedVersion": "2",
+            "x": -140.8000030517578,
+            "y": 444.0,
+            "width": 140.79998779296876,
+            "height": 35.199981689453128
+        }
+    },
+    "m_Slots": [
+        {
+            "m_Id": "8d01207112da469da416b766de42c279"
+        }
+    ],
+    "synonyms": [],
+    "m_Precision": 0,
+    "m_PreviewExpanded": true,
+    "m_PreviewMode": 0,
+    "m_CustomColors": {
+        "m_SerializableColors": []
+    },
+    "m_Property": {
+        "m_Id": "ad9d2b3423574b00a6057bf984c02d2b"
+    }
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
     "m_ObjectId": "c908870d820045518fbbd620cc7a8fe2",
     "m_Id": 0,
@@ -978,6 +1062,10 @@
     "m_Type": "UnityEditor.ShaderGraph.CategoryData",
     "m_ObjectId": "fe39a5d8254a4c908e1d14d201abed6d",
     "m_Name": "",
-    "m_ChildObjectList": []
+    "m_ChildObjectList": [
+        {
+            "m_Id": "ad9d2b3423574b00a6057bf984c02d2b"
+        }
+    ]
 }
 

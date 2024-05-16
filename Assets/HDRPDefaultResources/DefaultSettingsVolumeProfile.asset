@@ -18,7 +18,7 @@ MonoBehaviour:
     m_Value: 1
   intensity:
     m_OverrideState: 1
-    m_Value: 0.5
+    m_Value: 0.1
   maximumVelocity:
     m_OverrideState: 0
     m_Value: 200
@@ -135,10 +135,10 @@ MonoBehaviour:
     m_Value: 0
   skyIntensityMode:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 1
   exposure:
     m_OverrideState: 0
-    m_Value: 11
+    m_Value: -172.3
   multiplier:
     m_OverrideState: 0
     m_Value: 1
@@ -299,7 +299,7 @@ MonoBehaviour:
   active: 1
   skyType:
     m_OverrideState: 1
-    m_Value: 4
+    m_Value: 1
   cloudType:
     m_OverrideState: 1
     m_Value: 0
@@ -308,7 +308,7 @@ MonoBehaviour:
     m_Value: 1
   windOrientation:
     m_OverrideState: 1
-    m_Value: 57
+    m_Value: 95
   windSpeed:
     m_OverrideState: 0
     m_Value: 100
@@ -332,23 +332,23 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: 1
   meteringMode:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 2
   luminanceSource:
     m_OverrideState: 0
     m_Value: 1
   fixedExposure:
     m_OverrideState: 1
-    m_Value: 11.825266
+    m_Value: 13.004435
   compensation:
     m_OverrideState: 0
     m_Value: 0
   limitMin:
     m_OverrideState: 0
-    m_Value: -10
+    m_Value: -5
   limitMax:
     m_OverrideState: 0
-    m_Value: 10
+    m_Value: 5.4878054
   curveMap:
     m_OverrideState: 0
     m_Value:
@@ -432,10 +432,10 @@ MonoBehaviour:
     m_Value: 1
   adaptationSpeedDarkToLight:
     m_OverrideState: 1
-    m_Value: 0.1
+    m_Value: 5
   adaptationSpeedLightToDark:
     m_OverrideState: 1
-    m_Value: 0.1
+    m_Value: 5
   weightTextureMask:
     m_OverrideState: 0
     m_Value: {fileID: 0}

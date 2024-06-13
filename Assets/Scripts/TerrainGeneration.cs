@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using UnityEngine.Rendering.HighDefinition;
+using UnityEngine.UI;
 
 public class TerrainGeneration : MonoBehaviour
 {
@@ -26,6 +28,9 @@ public class TerrainGeneration : MonoBehaviour
 
     [SerializeField] private Gradient gradient;
 
+    [SerializeField] private GameObject ocean;
+    [SerializeField] private float oceanMaskResoltuion;
+
     //the seed to be used
     int seed;
     //the total size of the map
@@ -47,6 +52,27 @@ public class TerrainGeneration : MonoBehaviour
                 chunks.Add(GenerateChunk(new Vector2(x, z)));
             }
         }
+        
+        //sorts out the ocean
+        float fullSize = edgeNumber*chunkSize*2 + (float) chunkSize/2f;
+        ocean.transform.localScale = new Vector3(fullSize,1,fullSize); //scale
+
+        int maskSize = (int) (fullSize*oceanMaskResoltuion);
+        Texture2D mask = new Texture2D(maskSize, maskSize);
+        for (int y = 0; y < maskSize; y++)
+        {
+            for (int x = 0; x < maskSize; x++)
+            {
+                float height = GetNewVertex((x - maskSize/2)/oceanMaskResoltuion,(y-maskSize/2)/oceanMaskResoltuion).y;
+                Color color = new Color(0.45f-height*0.3f, 1.8f-height*2f, 1, 1);
+                mask.SetPixel(x, y, color); 
+            }
+        }
+
+        //apply the oceanMask
+        mask.Apply();
+        ocean.GetComponent<WaterSurface>().waterMask = mask;
+        GameObject.Find("GameUI/Mask").GetComponent<RawImage>().texture = mask;
 
 
         AdjustWalls(); //moves the walls to the edge of the allowed map

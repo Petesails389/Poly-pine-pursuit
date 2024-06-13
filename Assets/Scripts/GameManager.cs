@@ -22,6 +22,7 @@ public class GameManager : NetworkBehaviour
 
     [SerializeField] private int targetNumberOfPlayers;
     [SerializeField] private float size;
+    [SerializeField] private int customSeed = 0;
 
     private PlayerController playerController; //reference to the player controller of the local player
 
@@ -96,9 +97,10 @@ public class GameManager : NetworkBehaviour
         gameUI.gameObject.SetActive(true);
 
         if (base.IsServerInitialized) {
-            //randomises the seed if this person is hosting
-            seed.Value = UnityEngine.Random.Range(-100000,100000);
             syncSize.Value = size;
+            //randomises the seed if this person is hosting
+            if (customSeed != 0) seed.Value = customSeed;
+            else seed.Value = UnityEngine.Random.Range(-100000,100000);
         }
 
         terrainGeneration.GenerateTerrain(seed.Value, syncSize.Value); //generate the terrain
